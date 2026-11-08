@@ -1,0 +1,60 @@
+:root {
+  /* Colors - Haute Couture Floral Palette */
+  --mf-bg-dark: #0c0d0c;
+  --mf-bg-card-dark: #141614;
+  --mf-bg-light: #fcfaf7;
+  --mf-bg-cream: #f4ede4;
+  --mf-bg-surface: #ffffff;
+  
+  --mf-gold-primary: #c5a059;
+  --mf-gold-light: #e5cf9f;
+  --mf-gold-hover: #b08d48;
+  --mf-gold-gradient: linear-gradient(135deg, #dfc085 0%, #b8934a 100%);
+  
+  --mf-crimson-deep: #7a1622;
+  --mf-crimson-light: #9c2738;
+  --mf-rose-blush: #e2b2b6;
+  
+  --mf-forest-deep: #16241b;
+  --mf-forest-subtle: #24382c;
+  
+  --mf-text-main: #1d1f1d;
+  --mf-text-muted: #6b706c;
+  --mf-text-light: #fcfaf7;
+  --mf-text-light-muted: #b5b8b5;
+  --mf-text-gold: #c5a059;
+  
+  --mf-border-light: rgba(0, 0, 0, 0.08);
+  --mf-border-dark: rgba(255, 255, 255, 0.1);
+  --mf-border-gold: rgba(197, 160, 89, 0.35);
+
+  /* Typography */
+  --font-serif-display: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+  --font-serif-headline: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-script: 'Cormorant Garamond', italic, serif;
+
+  /* Elevations & Shadows */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.14);
+  --shadow-gold: 0 10px 25px rgba(197, 160, 89, 0.25);
+  --shadow-dark: 0 25px 60px rgba(0, 0, 0, 0.6);
+
+  /* Transitions */
+  --transition-fast: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-smooth: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-luxury: 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+
+  /* Radii */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-pill: 9999px;
+
+  /* Layout */
+  --max-w-container: 1320px;
+  --header-height: 80px;
+  --topbar-height: 38px;
+}
