@@ -2131,3 +2131,235 @@
   gap: 16px;
 }
 
+
+/* ==========================================================================
+   ATELIER AUDIO PLAYER — "DILO CON FLORES"
+   ========================================================================== */
+.mf-audio-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(22, 24, 22, 0.78);
+  border: 1px solid rgba(197, 160, 89, 0.35);
+  padding: 6px 14px;
+  border-radius: 30px;
+  cursor: pointer;
+  color: var(--mf-cream-light, #F4EFEA);
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  backdrop-filter: blur(10px);
+  position: relative;
+  outline: none;
+}
+
+.mf-audio-pill:hover {
+  background: rgba(30, 34, 30, 0.95);
+  border-color: var(--mf-gold-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.15);
+}
+
+.mf-audio-pill.playing {
+  border-color: var(--mf-gold-primary);
+  box-shadow: 0 0 16px rgba(212, 175, 55, 0.25);
+  background: rgba(28, 46, 36, 0.65);
+}
+
+.mf-audio-waves {
+  display: flex;
+  align-items: flex-end;
+  gap: 2.5px;
+  height: 14px;
+  width: 14px;
+}
+
+.mf-audio-bar {
+  width: 2px;
+  height: 100%;
+  background: var(--mf-gold-primary);
+  border-radius: 2px;
+  transform-origin: bottom;
+  transform: scaleY(0.25);
+  transition: transform 0.2s ease;
+}
+
+.mf-audio-pill.playing .mf-audio-bar:nth-child(1) {
+  animation: mfWave 0.9s infinite ease-in-out;
+}
+.mf-audio-pill.playing .mf-audio-bar:nth-child(2) {
+  animation: mfWave 0.7s infinite ease-in-out 0.15s;
+}
+.mf-audio-pill.playing .mf-audio-bar:nth-child(3) {
+  animation: mfWave 1.1s infinite ease-in-out 0.3s;
+}
+.mf-audio-pill.playing .mf-audio-bar:nth-child(4) {
+  animation: mfWave 0.8s infinite ease-in-out 0.1s;
+}
+
+@keyframes mfWave {
+  0%, 100% {
+    transform: scaleY(0.25);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+.mf-audio-text {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  line-height: 1.15;
+}
+
+.mf-audio-label {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  color: var(--mf-gold-light);
+  letter-spacing: 0.12em;
+  font-weight: 600;
+}
+
+.mf-audio-track {
+  font-size: 0.76rem;
+  color: var(--mf-cream-light);
+  font-family: var(--font-serif-headline);
+  font-style: italic;
+}
+
+/* Botón Hero de Atmósfera Sonora */
+.mf-hero-music-wrap {
+  margin-top: 26px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.mf-hero-music-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(14, 15, 14, 0.72);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  padding: 8px 18px;
+  border-radius: 40px;
+  color: var(--mf-cream-light);
+  cursor: pointer;
+  transition: all 0.35s ease;
+  backdrop-filter: blur(12px);
+  text-align: left;
+  font-family: var(--font-sans);
+}
+
+.mf-hero-music-btn:hover {
+  background: rgba(22, 24, 22, 0.92);
+  border-color: var(--mf-gold-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(212, 175, 55, 0.2);
+}
+
+.mf-hero-music-disc {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--mf-gold-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--mf-gold-primary);
+  background: rgba(212, 175, 55, 0.08);
+  transition: transform 0.6s linear;
+}
+
+.mf-hero-music-btn.playing .mf-hero-music-disc {
+  animation: mfSpin 4s linear infinite;
+}
+
+@keyframes mfSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.mf-hero-music-copy {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.mf-hero-music-tag {
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mf-gold-primary);
+  font-weight: 600;
+}
+
+.mf-hero-music-title {
+  font-size: 0.85rem;
+  color: var(--mf-cream-light);
+  font-family: var(--font-serif-headline);
+}
+
+.mf-hero-music-play-icon {
+  font-size: 0.75rem;
+  color: var(--mf-gold-light);
+  margin-left: 4px;
+}
+
+/* Toast flotante de reproducción */
+.mf-audio-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  z-index: 9999;
+  background: rgba(14, 15, 14, 0.94);
+  border: 1px solid var(--mf-gold-primary);
+  border-radius: 30px;
+  padding: 8px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--mf-cream-light);
+  font-family: var(--font-serif-headline);
+  font-size: 0.88rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(15px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.mf-audio-toast.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.mf-audio-toast-icon {
+  color: var(--mf-gold-primary);
+  font-size: 1rem;
+  animation: mfPulse 1.5s infinite alternate;
+}
+
+@keyframes mfPulse {
+  from { transform: scale(0.9); opacity: 0.8; }
+  to { transform: scale(1.15); opacity: 1; }
+}
+
+@media (max-width: 768px) {
+  .mf-audio-pill .mf-audio-text {
+    display: none;
+  }
+  .mf-audio-pill {
+    padding: 8px;
+    border-radius: 50%;
+  }
+  .mf-audio-toast {
+    left: 16px;
+    bottom: 80px;
+    font-size: 0.8rem;
+    padding: 6px 14px;
+  }
+}

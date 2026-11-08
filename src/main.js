@@ -8,6 +8,7 @@ window.store = store;
 
 document.addEventListener('DOMContentLoaded', () => {
   initHeader();
+  initAtelierAudio();
   renderEmotions();
   renderProducts();
   renderBestsellers();
@@ -1377,3 +1378,96 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+
+
+/* ==========================================================================
+   ATELIER AMBIENT AUDIO — "DILO CON FLORES"
+   ========================================================================== */
+function initAtelierAudio() {
+  const audioEl = document.getElementById('mf-atelier-audio');
+  const headerBtn = document.getElementById('btn-audio-toggle');
+  const heroBtn = document.getElementById('btn-hero-audio');
+  const heroIcon = document.getElementById('hero-audio-state-icon');
+  const toastEl = document.getElementById('mf-audio-toast');
+  const toastMsg = document.getElementById('mf-audio-toast-msg');
+
+  if (!audioEl) return;
+
+  // Set audio source with Vite base url compatibility
+  const audioBase = import.meta.env.BASE_URL.endsWith('/') 
+    ? import.meta.env.BASE_URL 
+    : import.meta.env.BASE_URL + '/';
+  audioEl.src = `${audioBase}audio/dilo-con-flores.mp3`;
+  audioEl.volume = 0.55;
+
+  let isPlaying = false;
+  let toastTimeout = null;
+
+  function showToast(message) {
+    if (!toastEl || !toastMsg) return;
+    toastMsg.textContent = message;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => {
+      toastEl.classList.remove('show');
+    }, 3800);
+  }
+
+  function updateUI(playing) {
+    isPlaying = playing;
+    if (headerBtn) {
+      if (playing) {
+        headerBtn.classList.add('playing');
+        headerBtn.setAttribute('title', 'Pausar música del Atelier');
+      } else {
+        headerBtn.classList.remove('playing');
+        headerBtn.setAttribute('title', 'Reproducir: Dilo con flores');
+      }
+    }
+
+    if (heroBtn) {
+      if (playing) {
+        heroBtn.classList.add('playing');
+        if (heroIcon) heroIcon.textContent = '❚❚';
+      } else {
+        heroBtn.classList.remove('playing');
+        if (heroIcon) heroIcon.textContent = '▶';
+      }
+    }
+  }
+
+  async function togglePlay() {
+    try {
+      if (audioEl.paused) {
+        await audioEl.play();
+        updateUI(true);
+        showToast('♪ Reproduciendo en el Atelier: “Dilo con flores”');
+      } else {
+        audioEl.pause();
+        updateUI(false);
+        showToast('Atelier en silencio');
+      }
+    } catch (err) {
+      console.warn('Autoplay prevented or audio playback error:', err);
+      updateUI(false);
+    }
+  }
+
+  if (headerBtn) {
+    headerBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      togglePlay();
+    });
+  }
+
+  if (heroBtn) {
+    heroBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      togglePlay();
+    });
+  }
+
+  audioEl.addEventListener('play', () => updateUI(true));
+  audioEl.addEventListener('pause', () => updateUI(false));
+  audioEl.addEventListener('ended', () => updateUI(false));
+}
