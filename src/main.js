@@ -1455,9 +1455,78 @@ function initAtelierAudio() {
     }
   }
 
+  function fadeInAudio(targetVolume = 0.55, durationMs = 1800) {
+    audioEl.volume = 0;
+    const stepTime = 50;
+    const stepIncrement = targetVolume / (durationMs / stepTime);
+    
+    const fadeTimer = setInterval(() => {
+      if (audioEl.paused) {
+        clearInterval(fadeTimer);
+        return;
+      }
+      if (audioEl.volume + stepIncrement >= targetVolume) {
+        audioEl.volume = targetVolume;
+        clearInterval(fadeTimer);
+      } else {
+        audioEl.volume = Math.min(targetVolume, audioEl.volume + stepIncrement);
+      }
+    }, stepTime);
+  }
+
+  // Reproducción automática en el primer scroll
+  let scrollTriggered = false;
+
+  async function triggerFirstScrollAudio() {
+    if (scrollTriggered || isPlaying) return;
+    scrollTriggered = true;
+
+    // Remover listeners para ejecución única
+    window.removeEventListener('scroll', handleScroll);
+    window.removeEventListener('wheel', handleScroll);
+    window.removeEventListener('touchmove', handleScroll);
+
+    try {
+      audioEl.volume = 0;
+      await audioEl.play();
+      updateUI(true);
+      fadeInAudio(0.55, 1800);
+      showToast('♪ Música del Atelier: “Dilo con flores”');
+    } catch (err) {
+      console.log('Autoplay on scroll waiting for interaction gesture:', err);
+      const onFirstInteraction = async () => {
+        if (!isPlaying) {
+          try {
+            audioEl.volume = 0;
+            await audioEl.play();
+            updateUI(true);
+            fadeInAudio(0.55, 1800);
+            showToast('♪ Música del Atelier: “Dilo con flores”');
+          } catch (e) {}
+        }
+        window.removeEventListener('click', onFirstInteraction);
+        window.removeEventListener('keydown', onFirstInteraction);
+      };
+      window.addEventListener('click', onFirstInteraction, { once: true });
+      window.addEventListener('keydown', onFirstInteraction, { once: true });
+    }
+  }
+
+  function handleScroll() {
+    if (window.scrollY > 20) {
+      triggerFirstScrollAudio();
+    }
+  }
+
+  window.addEventListener('scroll', handleScroll, { passive: true });
+  window.addEventListener('wheel', handleScroll, { passive: true });
+  window.addEventListener('touchmove', handleScroll, { passive: true });
+
   async function togglePlay() {
+    scrollTriggered = true;
     try {
       if (audioEl.paused) {
+        audioEl.volume = 0.55;
         await audioEl.play();
         updateUI(true);
         showToast('♪ Reproduciendo en el Atelier: “Dilo con flores”');
