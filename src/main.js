@@ -1393,12 +1393,31 @@ function initAtelierAudio() {
 
   if (!audioEl) return;
 
-  // Set audio source with Vite base url compatibility
+  // Set audio source with Vite base url compatibility & dual fallback
   const audioBase = import.meta.env.BASE_URL.endsWith('/') 
     ? import.meta.env.BASE_URL 
     : import.meta.env.BASE_URL + '/';
-  audioEl.src = `${audioBase}audio/dilo-con-flores.mp3`;
+  
+  const sources = [
+    `${audioBase}audio/dilo-con-flores.mp3`,
+    `${audioBase}public/audio/dilo-con-flores.mp3`,
+    './audio/dilo-con-flores.mp3',
+    './public/audio/dilo-con-flores.mp3'
+  ];
+  let currentSourceIndex = 0;
+
+  audioEl.src = sources[0];
   audioEl.volume = 0.55;
+
+  audioEl.addEventListener('error', () => {
+    if (currentSourceIndex < sources.length - 1) {
+      currentSourceIndex++;
+      audioEl.src = sources[currentSourceIndex];
+      if (isPlaying) {
+        audioEl.play().catch(() => {});
+      }
+    }
+  });
 
   let isPlaying = false;
   let toastTimeout = null;
