@@ -6,7 +6,7 @@ export const JOURNAL_ARTICLES = [
     date: '28 Sep 2026',
     readTime: '4 min de lectura',
     category: 'Etiqueta Floral',
-    image: '/images/prod-disculpa.jpg',
+    image: './images/prod-disculpa.jpg',
     author: 'Monsieur Flores'
   },
   {
@@ -16,7 +16,7 @@ export const JOURNAL_ARTICLES = [
     date: '22 Sep 2026',
     readTime: '6 min de lectura',
     category: 'Simbolismo Botánico',
-    image: '/images/prod-clasica.jpg',
+    image: './images/prod-clasica.jpg',
     author: 'Monsieur Flores'
   },
   {
@@ -26,7 +26,7 @@ export const JOURNAL_ARTICLES = [
     date: '15 Sep 2026',
     readTime: '5 min de lectura',
     category: 'Tradición',
-    image: '/images/prod-inolvidable.jpg',
+    image: './images/prod-inolvidable.jpg',
     author: 'Monsieur Flores'
   }
 ];
@@ -59,10 +59,10 @@ export const TESTIMONIALS = [
 ];
 
 export const INSTAGRAM_POSTS = [
-  { id: 1, image: '/images/monsieur-paris-boutique.jpg', likes: '4.8k', comments: '184', caption: 'Fleurs du Monsieur, Rue Saint-Honoré, Paris.' },
-  { id: 2, image: '/images/monsieur-biografia.jpg', likes: '6.2k', comments: '342', caption: 'Hay cosas que las palabras no saben decir.' },
-  { id: 3, image: '/images/monsieur-atelier-craft.jpg', likes: '5.1k', comments: '219', caption: 'En el atelier: cada tallo se escoge con el pulso del corazón.' },
-  { id: 4, image: '/images/monsieur-rose-mirror.jpg', likes: '3.9k', comments: '167', caption: 'La perspectiva de la elegancia. Monsieur sabe.' },
-  { id: 5, image: '/images/monsieur-arte-coleccion.jpg', likes: '4.4k', comments: '195', caption: 'Del Papel a la Flor: el boceto antes de la creación.' },
-  { id: 6, image: '/images/prod-clasica.jpg', likes: '3.1k', comments: '128', caption: 'La Clásica en terciopelo imperial.' }
+  { id: 1, image: './images/monsieur-paris-boutique.jpg', likes: '4.8k', comments: '184', caption: 'Fleurs du Monsieur, Rue Saint-Honoré, Paris.' },
+  { id: 2, image: './images/monsieur-biografia.jpg', likes: '6.2k', comments: '342', caption: 'Hay cosas que las palabras no saben decir.' },
+  { id: 3, image: './images/monsieur-atelier-craft.jpg', likes: '5.1k', comments: '219', caption: 'En el atelier: cada tallo se escoge con el pulso del corazón.' },
+  { id: 4, image: './images/monsieur-rose-mirror.jpg', likes: '3.9k', comments: '167', caption: 'La perspectiva de la elegancia. Monsieur sabe.' },
+  { id: 5, image: './images/monsieur-arte-coleccion.jpg', likes: '4.4k', comments: '195', caption: 'Del Papel a la Flor: el boceto antes de la creación.' },
+  { id: 6, image: './images/prod-clasica.jpg', likes: '3.1k', comments: '128', caption: 'La Clásica en terciopelo imperial.' }
 ];

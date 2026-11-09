@@ -8,7 +8,7 @@ export const PRODUCTS = [
     originalPrice: 1499,
     rating: 4.9,
     reviewsCount: 142,
-    image: '/images/prod-clasica.jpg',
+    image: './images/prod-clasica.jpg',
     category: 'rosas',
     emotions: ['amor', 'sorprenderte', 'felicidades', 'porque-si'],
     badge: 'La Más Deseada',
@@ -36,7 +36,7 @@ export const PRODUCTS = [
     originalPrice: 2899,
     rating: 5.0,
     reviewsCount: 98,
-    image: '/images/prod-inolvidable.jpg',
+    image: './images/prod-inolvidable.jpg',
     category: 'premium',
     emotions: ['amor', 'sorprenderte', 'cumpleanos'],
     badge: 'Firma de Monsieur',
@@ -62,7 +62,7 @@ export const PRODUCTS = [
     originalPrice: 1799,
     rating: 4.8,
     reviewsCount: 87,
-    image: '/images/prod-disculpa.jpg',
+    image: './images/prod-disculpa.jpg',
     category: 'flores-regalo',
     emotions: ['perdoname', 'extrano', 'contigo'],
     badge: 'Reconciliación',
@@ -88,7 +88,7 @@ export const PRODUCTS = [
     originalPrice: 1199,
     rating: 4.9,
     reviewsCount: 165,
-    image: '/images/prod-porque-si.jpg',
+    image: './images/prod-porque-si.jpg',
     category: 'bouquets',
     emotions: ['porque-si', 'extrano', 'contigo', 'amor'],
     badge: 'Favorito de Temporada',
@@ -114,7 +114,7 @@ export const PRODUCTS = [
     originalPrice: 1550,
     rating: 4.9,
     reviewsCount: 74,
-    image: '/images/cat-tulipanes.jpg',
+    image: './images/cat-tulipanes.jpg',
     category: 'tulipanes',
     emotions: ['cumpleanos', 'felicidades', 'porque-si', 'amor'],
     badge: 'Edición Limitada',
@@ -140,7 +140,7 @@ export const PRODUCTS = [
     originalPrice: 2100,
     rating: 5.0,
     reviewsCount: 112,
-    image: '/images/cat-orquideas.jpg',
+    image: './images/cat-orquideas.jpg',
     category: 'orquideas',
     emotions: ['felicidades', 'sorprenderte', 'contigo', 'cumpleanos'],
     badge: 'Duración 90+ Días',
@@ -160,14 +160,14 @@ export const PRODUCTS = [
 ];
 
 export const CATEGORIES = [
-  { id: 'rosas', name: 'Rosas de Terciopelo', subtitle: 'Selección Imperial', count: 18, image: '/images/prod-clasica.jpg' },
-  { id: 'tulipanes', name: 'Tulipanes Holandeses', subtitle: 'Frescura de Ámsterdam', count: 9, image: '/images/cat-tulipanes.jpg' },
-  { id: 'orquideas', name: 'Orquídeas Phalaenopsis', subtitle: 'Escultura Viva', count: 6, image: '/images/cat-orquideas.jpg' },
-  { id: 'bouquets', name: 'Bouquets Silvestres', subtitle: 'Diseño Etéreo', count: 14, image: '/images/prod-porque-si.jpg' },
-  { id: 'flores-regalo', name: 'Cofres & Bombones', subtitle: 'Maridajes Finos', count: 11, image: '/images/prod-disculpa.jpg' },
-  { id: 'premium', name: 'Alta Costura Floral', subtitle: 'Ediciones de Sombrerera', count: 8, image: '/images/prod-inolvidable.jpg' },
-  { id: 'plantas', name: 'Botánica Escultórica', subtitle: 'Colección Interior', count: 7, image: '/images/cat-orquideas.jpg' },
-  { id: 'girasoles', name: 'Girasoles Soleils', subtitle: 'Luz & Esplendor', count: 5, image: '/images/prod-porque-si.jpg' }
+  { id: 'rosas', name: 'Rosas de Terciopelo', subtitle: 'Selección Imperial', count: 18, image: './images/prod-clasica.jpg' },
+  { id: 'tulipanes', name: 'Tulipanes Holandeses', subtitle: 'Frescura de Ámsterdam', count: 9, image: './images/cat-tulipanes.jpg' },
+  { id: 'orquideas', name: 'Orquídeas Phalaenopsis', subtitle: 'Escultura Viva', count: 6, image: './images/cat-orquideas.jpg' },
+  { id: 'bouquets', name: 'Bouquets Silvestres', subtitle: 'Diseño Etéreo', count: 14, image: './images/prod-porque-si.jpg' },
+  { id: 'flores-regalo', name: 'Cofres & Bombones', subtitle: 'Maridajes Finos', count: 11, image: './images/prod-disculpa.jpg' },
+  { id: 'premium', name: 'Alta Costura Floral', subtitle: 'Ediciones de Sombrerera', count: 8, image: './images/prod-inolvidable.jpg' },
+  { id: 'plantas', name: 'Botánica Escultórica', subtitle: 'Colección Interior', count: 7, image: './images/cat-orquideas.jpg' },
+  { id: 'girasoles', name: 'Girasoles Soleils', subtitle: 'Luz & Esplendor', count: 5, image: './images/prod-porque-si.jpg' }
 ];
 
 export const ADDONS = [

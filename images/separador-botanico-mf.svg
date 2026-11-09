@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 24" width="300" height="24">
+  <line x1="10" y1="12" x2="110" y2="12" stroke="#C5A059" stroke-width="0.8" opacity="0.6"/>
+  <line x1="190" y1="12" x2="290" y2="12" stroke="#C5A059" stroke-width="0.8" opacity="0.6"/>
+  
+  <!-- Roseta central -->
+  <circle cx="150" cy="12" r="3.5" fill="#C5A059"/>
+  <circle cx="150" cy="12" r="6" fill="none" stroke="#E2BE76" stroke-width="0.8" opacity="0.7"/>
+  
+  <!-- Hojas y volutas a la izquierda -->
+  <path d="M 140 12 C 135 7, 126 9, 122 12 C 126 15, 135 17, 140 12 Z" fill="#C5A059" opacity="0.8"/>
+  <circle cx="116" cy="12" r="1.5" fill="#C5A059"/>
+
+  <!-- Hojas y volutas a la derecha -->
+  <path d="M 160 12 C 165 7, 174 9, 178 12 C 174 15, 165 17, 160 12 Z" fill="#C5A059" opacity="0.8"/>
+  <circle cx="184" cy="12" r="1.5" fill="#C5A059"/>
+</svg>
