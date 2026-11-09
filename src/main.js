@@ -1474,53 +1474,133 @@ function initAtelierAudio() {
     }, stepTime);
   }
 
-  // Reproducción automática en el primer scroll
-  let scrollTriggered = false;
+  // Detección de dispositivo: Móvil vs PC/Desktop
+  const isMobile = (('ontouchstart' in window) || (navigator.maxTouchPoints > 0)) && window.innerWidth <= 768;
 
-  async function triggerFirstScrollAudio() {
-    if (scrollTriggered || isPlaying) return;
-    scrollTriggered = true;
+  // Elementos del Modal de PC
+  const soundtrackOverlay = document.getElementById('soundtrack-modal-overlay');
+  const btnSoundtrackAccept = document.getElementById('btn-soundtrack-accept');
+  const btnSoundtrackDecline = document.getElementById('btn-soundtrack-decline');
+  const btnSoundtrackClose = document.getElementById('btn-soundtrack-close');
 
-    // Remover listeners para ejecución única
-    window.removeEventListener('scroll', handleScroll);
-    window.removeEventListener('wheel', handleScroll);
-    window.removeEventListener('touchmove', handleScroll);
+  function openSoundtrackModal() {
+    if (soundtrackOverlay) {
+      soundtrackOverlay.classList.add('active');
+      soundtrackOverlay.setAttribute('aria-hidden', 'false');
+    }
+  }
 
-    try {
-      audioEl.volume = 0;
-      await audioEl.play();
-      updateUI(true);
-      fadeInAudio(0.55, 1800);
-      showToast('♪ Música del Atelier: “Dilo con flores”');
-    } catch (err) {
-      console.log('Autoplay on scroll waiting for interaction gesture:', err);
-      const onFirstInteraction = async () => {
+  function closeSoundtrackModal() {
+    if (soundtrackOverlay) {
+      soundtrackOverlay.classList.remove('active');
+      soundtrackOverlay.setAttribute('aria-hidden', 'true');
+    }
+  }
+
+  if (isMobile) {
+    // ----------------------------------------------------
+    // COMPORTAMIENTO MÓVIL: INICIA AL PRIMER SCROLL
+    // ----------------------------------------------------
+    let scrollTriggered = false;
+
+    async function triggerFirstScrollAudio() {
+      if (scrollTriggered || isPlaying) return;
+      scrollTriggered = true;
+
+      window.removeEventListener('scroll', handleMobileScroll);
+      window.removeEventListener('wheel', handleMobileScroll);
+      window.removeEventListener('touchmove', handleMobileScroll);
+
+      try {
+        audioEl.volume = 0;
+        await audioEl.play();
+        updateUI(true);
+        fadeInAudio(0.55, 1800);
+        showToast('♪ Música del Atelier: “Dilo con flores”');
+      } catch (err) {
+        console.log('Mobile scroll audio waiting for user touch:', err);
+        const onFirstTouch = async () => {
+          if (!isPlaying) {
+            try {
+              audioEl.volume = 0;
+              await audioEl.play();
+              updateUI(true);
+              fadeInAudio(0.55, 1800);
+              showToast('♪ Música del Atelier: “Dilo con flores”');
+            } catch (e) {}
+          }
+          window.removeEventListener('touchend', onFirstTouch);
+          window.removeEventListener('click', onFirstTouch);
+        };
+        window.addEventListener('touchend', onFirstTouch, { once: true });
+        window.addEventListener('click', onFirstTouch, { once: true });
+      }
+    }
+
+    function handleMobileScroll() {
+      if (window.scrollY > 15) {
+        triggerFirstScrollAudio();
+      }
+    }
+
+    window.addEventListener('scroll', handleMobileScroll, { passive: true });
+    window.addEventListener('wheel', handleMobileScroll, { passive: true });
+    window.addEventListener('touchmove', handleMobileScroll, { passive: true });
+
+  } else {
+    // ----------------------------------------------------
+    // COMPORTAMIENTO PC / DESKTOP: POPUP DE BANDA SONORA
+    // ----------------------------------------------------
+    const alreadyAnswered = sessionStorage.getItem('mf_soundtrack_prompted');
+
+    if (!alreadyAnswered) {
+      // Mostrar popup elegante tras 1.2s en PC
+      setTimeout(() => {
         if (!isPlaying) {
-          try {
-            audioEl.volume = 0;
-            await audioEl.play();
-            updateUI(true);
-            fadeInAudio(0.55, 1800);
-            showToast('♪ Música del Atelier: “Dilo con flores”');
-          } catch (e) {}
+          openSoundtrackModal();
         }
-        window.removeEventListener('click', onFirstInteraction);
-        window.removeEventListener('keydown', onFirstInteraction);
-      };
-      window.addEventListener('click', onFirstInteraction, { once: true });
-      window.addEventListener('keydown', onFirstInteraction, { once: true });
+      }, 1200);
+    }
+
+    if (btnSoundtrackAccept) {
+      btnSoundtrackAccept.addEventListener('click', async () => {
+        sessionStorage.setItem('mf_soundtrack_prompted', 'true');
+        closeSoundtrackModal();
+        try {
+          audioEl.volume = 0;
+          await audioEl.play();
+          updateUI(true);
+          fadeInAudio(0.55, 1800);
+          showToast('♪ Reproduciendo en el Atelier: “Dilo con flores”');
+        } catch (e) {
+          console.warn('Playback error:', e);
+        }
+      });
+    }
+
+    if (btnSoundtrackDecline) {
+      btnSoundtrackDecline.addEventListener('click', () => {
+        sessionStorage.setItem('mf_soundtrack_prompted', 'true');
+        closeSoundtrackModal();
+      });
+    }
+
+    if (btnSoundtrackClose) {
+      btnSoundtrackClose.addEventListener('click', () => {
+        sessionStorage.setItem('mf_soundtrack_prompted', 'true');
+        closeSoundtrackModal();
+      });
+    }
+
+    if (soundtrackOverlay) {
+      soundtrackOverlay.addEventListener('click', (e) => {
+        if (e.target === soundtrackOverlay) {
+          sessionStorage.setItem('mf_soundtrack_prompted', 'true');
+          closeSoundtrackModal();
+        }
+      });
     }
   }
-
-  function handleScroll() {
-    if (window.scrollY > 20) {
-      triggerFirstScrollAudio();
-    }
-  }
-
-  window.addEventListener('scroll', handleScroll, { passive: true });
-  window.addEventListener('wheel', handleScroll, { passive: true });
-  window.addEventListener('touchmove', handleScroll, { passive: true });
 
   async function togglePlay() {
     scrollTriggered = true;

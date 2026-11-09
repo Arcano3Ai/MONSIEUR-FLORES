@@ -925,6 +925,48 @@
   <!-- REPRODUCTOR AMBIENTAL DE ALTA COSTURA: "DILO CON FLORES" -->
   <audio id="mf-atelier-audio" loop preload="auto"></audio>
 
+  <!-- MODAL / POPUP DE BANDA SONORA (PC / DESKTOP) -->
+  <div class="mf-soundtrack-modal-overlay" id="soundtrack-modal-overlay" aria-hidden="true">
+    <div class="mf-soundtrack-card" role="dialog" aria-modal="true" aria-labelledby="soundtrack-modal-title">
+      <button class="mf-soundtrack-close" id="btn-soundtrack-close" aria-label="Cerrar ventana">✕</button>
+      
+      <div class="mf-soundtrack-badge">
+        <span class="mf-soundtrack-badge-icon">✦</span>
+        <span>Atmósfera Sonora del Atelier</span>
+      </div>
+
+      <div class="mf-soundtrack-disc-wrap">
+        <div class="mf-soundtrack-vinyl">
+          <div class="mf-soundtrack-vinyl-center"></div>
+        </div>
+      </div>
+
+      <h3 class="mf-soundtrack-title" id="soundtrack-modal-title">¿Deseas activar la banda sonora?</h3>
+      <p class="mf-soundtrack-desc">
+        Acompaña tu recorrido por la boutique con nuestra pieza original de alta costura: <em>“Dilo con flores”</em>.
+      </p>
+
+      <div class="mf-soundtrack-actions">
+        <button class="btn-monsieur mf-btn-soundtrack-accept" id="btn-soundtrack-accept">
+          <span class="mf-audio-waves mini" aria-hidden="true">
+            <span class="mf-audio-bar"></span>
+            <span class="mf-audio-bar"></span>
+            <span class="mf-audio-bar"></span>
+            <span class="mf-audio-bar"></span>
+          </span>
+          <span>Activar Banda Sonora</span>
+        </button>
+        <button class="mf-soundtrack-decline" id="btn-soundtrack-decline">
+          Continuar en silencio
+        </button>
+      </div>
+
+      <div class="mf-soundtrack-footer">
+        <span>Siempre podrás activar o pausar la música en el botón superior</span>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast flotante de reproducción musical -->
   <div class="mf-audio-toast" id="mf-audio-toast" aria-live="polite">
     <span class="mf-audio-toast-icon">♪</span>
