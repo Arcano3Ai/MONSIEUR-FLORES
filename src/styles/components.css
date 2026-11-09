@@ -2101,9 +2101,12 @@ main, section, header, footer {
     flex-wrap: nowrap !important;
     overflow-x: auto !important;
     -webkit-overflow-scrolling: touch;
-    padding: 4px 16px 14px 16px;
-    margin-left: -16px;
-    margin-right: -16px;
+    padding: 6px 4px 14px 4px !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
     scrollbar-width: none;
   }
   #category-filter-bar::-webkit-scrollbar { display: none; }
@@ -2120,13 +2123,15 @@ main, section, header, footer {
   }
 
   .mf-products-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
     gap: 24px;
+    width: 100% !important;
   }
 
   .mf-product-card {
-    width: 100%;
-    max-width: 100%;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   /* Categorías Grid */
@@ -2272,21 +2277,70 @@ main, section, header, footer {
     padding: 6px 12px;
   }
 
+  .mf-testimonials-grid {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+
+  .mf-about-badge {
+    right: 12px !important;
+    bottom: 12px !important;
+    max-width: calc(100% - 24px) !important;
+    padding: 14px 18px !important;
+  }
+
+  .mf-newsletter-form {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  .mf-newsletter-input {
+    border-radius: var(--radius-xs) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.15) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .mf-newsletter-btn {
+    border-radius: var(--radius-xs) !important;
+    padding: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
   .mf-footer-grid {
-    grid-template-columns: 1fr;
-    gap: 30px;
+    grid-template-columns: 1fr !important;
+    gap: 30px !important;
+  }
+
+  .mf-footer-bottom {
+    flex-direction: column !important;
+    text-align: center !important;
+    gap: 14px !important;
+    padding-bottom: 84px !important; /* Margen vital para no ser ocultado por la barra inferior */
   }
 }
 
 @media (max-width: 420px) {
   .mf-emotions-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
   }
   .mf-categories-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
   }
   .mf-wizard-options-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
+  }
+  .mf-audio-float-control {
+    left: 8px !important;
+    bottom: 72px !important;
+    padding: 6px 10px !important;
+    gap: 6px !important;
+  }
+  .mf-concierge-float {
+    right: 8px !important;
+    bottom: 72px !important;
+    padding: 6px 10px !important;
   }
 }
 

@@ -1401,21 +1401,17 @@ function initAtelierAudio() {
   audioEl.setAttribute('webkit-playsinline', 'true');
   audioEl.volume = 0.35; // Nivel audible calibrado
 
-  // Asignar fuente si no está precargada en HTML
-  const audioBase = import.meta.env.BASE_URL.endsWith('/') 
-    ? import.meta.env.BASE_URL 
-    : import.meta.env.BASE_URL + '/';
-  
-  const sources = [
-    `${audioBase}audio/dilo-con-flores.mp3`,
-    `${audioBase}public/audio/dilo-con-flores.mp3`,
+  // Asignar fuente únicamente si el elemento no tiene src definido en HTML
+  const basePrefix = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '');
+  const candidateUrls = [
+    `${basePrefix}/audio/dilo-con-flores.mp3`,
     './audio/dilo-con-flores.mp3',
     './public/audio/dilo-con-flores.mp3'
   ];
-  let currentSourceIndex = 0;
+  let candidateIndex = 0;
 
   if (!audioEl.src && !audioEl.currentSrc) {
-    audioEl.src = sources[0];
+    audioEl.src = candidateUrls[0];
   }
 
   let isPlaying = false;
@@ -1424,9 +1420,9 @@ function initAtelierAudio() {
   let toastTimeout = null;
 
   audioEl.addEventListener('error', () => {
-    if (currentSourceIndex < sources.length - 1) {
-      currentSourceIndex++;
-      audioEl.src = sources[currentSourceIndex];
+    if (candidateIndex < candidateUrls.length - 1) {
+      candidateIndex++;
+      audioEl.src = candidateUrls[candidateIndex];
       if (isPlaying && !userMuted) {
         audioEl.play().catch(() => {});
       }
