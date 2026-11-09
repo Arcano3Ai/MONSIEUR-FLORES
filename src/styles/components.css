@@ -503,25 +503,38 @@
   position: absolute;
   top: 14px;
   right: 14px;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(8px);
-  color: var(--mf-text-muted);
-  width: 36px;
-  height: 36px;
+  background: rgba(14, 15, 14, 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--mf-gold-light, #F2D59B);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.1rem;
-  box-shadow: var(--shadow-sm);
+  font-size: 1.05rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
   z-index: 2;
-  transition: all var(--transition-fast);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
 }
 
-.mf-card-fav-btn:hover, .mf-card-fav-btn.active {
-  background: var(--mf-crimson-deep);
-  color: white;
-  transform: scale(1.08);
+.mf-card-fav-btn:hover {
+  background: rgba(24, 26, 24, 0.95);
+  color: #ffffff;
+  border-color: var(--mf-gold-primary);
+  transform: scale(1.1);
+  box-shadow: 0 6px 18px rgba(197, 160, 89, 0.4);
+}
+
+.mf-card-fav-btn.active {
+  background: linear-gradient(135deg, #8B1A28 0%, #5E0E18 100%);
+  color: #ffffff;
+  border-color: #D4AF37;
+  transform: scale(1.12);
+  box-shadow: 0 6px 18px rgba(139, 26, 40, 0.5);
 }
 
 .mf-card-body {
@@ -599,43 +612,85 @@
 
 .mf-btn-add {
   flex-grow: 1;
-  background: var(--mf-bg-dark);
-  color: var(--mf-text-light);
-  font-size: 0.8rem;
-  letter-spacing: 0.1em;
+  background: linear-gradient(135deg, #181A18 0%, #0F100F 100%);
+  color: var(--mf-gold-light, #F2D59B);
+  font-family: var(--font-serif-headline);
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   font-weight: 600;
-  padding: 12px 16px;
-  border-radius: var(--radius-sm);
+  padding: 13px 18px;
+  border-radius: 2px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  border: 1px solid transparent;
+  border: 1px solid rgba(197, 160, 89, 0.45);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mf-btn-add::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  border: 1px solid rgba(197, 160, 89, 0.2);
+  pointer-events: none;
+  transition: border-color 0.25s ease;
 }
 
 .mf-btn-add:hover {
-  background: var(--mf-gold-primary);
-  color: #0c0d0c;
+  background: linear-gradient(135deg, #DEBE7D 0%, #C5A059 55%, #9F7932 100%);
+  color: #0C0D0C;
+  border-color: #F5DEB3;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(197, 160, 89, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.mf-btn-add:hover::before {
+  border-color: rgba(12, 13, 12, 0.4);
+}
+
+.mf-btn-add:active {
+  transform: translateY(1px) scale(0.98);
 }
 
 .mf-btn-quickview {
-  background: var(--mf-bg-light);
-  color: var(--mf-text-main);
-  border: 1px solid var(--mf-border-light);
+  background: rgba(18, 19, 18, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--mf-gold-light, #F2D59B);
+  border: 1px solid rgba(197, 160, 89, 0.35);
   width: 44px;
   height: 44px;
-  border-radius: var(--radius-sm);
+  border-radius: 2px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1rem;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
 }
 
 .mf-btn-quickview:hover {
-  background: #ffffff;
+  background: rgba(28, 30, 28, 0.95);
   border-color: var(--mf-gold-primary);
-  color: var(--mf-gold-primary);
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(197, 160, 89, 0.3);
+}
+
+.mf-btn-quickview:active {
+  transform: scale(0.95);
 }
 
 /* ==========================================================================
@@ -836,28 +891,36 @@
 }
 
 .mf-wizard-option-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: var(--radius-md);
+  background: rgba(20, 22, 20, 0.75);
+  border: 1px solid rgba(197, 160, 89, 0.35);
+  border-radius: 4px;
   padding: 22px 16px;
   text-align: center;
   color: var(--mf-text-light);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  -webkit-tap-highlight-color: transparent;
 }
 
 .mf-wizard-option-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(30, 34, 30, 0.95);
   border-color: var(--mf-gold-primary);
   transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(197, 160, 89, 0.3);
 }
 
 .mf-wizard-option-btn.selected {
-  background: var(--mf-gold-gradient);
-  color: #0c0d0c;
-  border-color: transparent;
-  font-weight: 600;
-  box-shadow: var(--shadow-gold);
+  background: linear-gradient(135deg, #DEBE7D 0%, #F5DEB3 25%, #C5A059 55%, #9F7932 100%) !important;
+  color: #0c0d0c !important;
+  border-color: #F2D59B !important;
+  font-weight: 600 !important;
+  box-shadow: 0 8px 24px rgba(197, 160, 89, 0.5), 
+              inset 0 1px 0 rgba(255, 255, 255, 0.7), 
+              inset 0 -1px 0 rgba(0, 0, 0, 0.25) !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+  transform: translateY(-2px);
 }
 
 .mf-wizard-option-icon {
@@ -971,29 +1034,68 @@
 }
 
 .mf-card-preview-live {
-  background: #fdfaf5;
-  border: 1px solid #ebd9c3;
-  border-radius: var(--radius-md);
-  padding: 40px;
-  box-shadow: var(--shadow-md);
+  background: radial-gradient(circle at 50% 25%, #FCFAF7 0%, #F5ECE1 100%);
+  border: 1px solid #D8C3A5;
+  border-radius: 4px;
+  padding: 46px 36px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.09), 
+              0 2px 6px rgba(197, 160, 89, 0.15), 
+              inset 0 0 0 1px rgba(197, 160, 89, 0.35);
   position: sticky;
   top: 100px;
   text-align: center;
+  overflow: hidden;
+}
+
+/* Filigranas de Esquina Francesas en la Tarjeta de Lujo */
+.mf-card-preview-live::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 42px;
+  height: 42px;
+  background: url('/images/filigrana-esquina-oro.svg') no-repeat center center / contain;
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+.mf-card-preview-live::after {
+  content: '';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 42px;
+  height: 42px;
+  background: url('/images/filigrana-esquina-oro.svg') no-repeat center center / contain;
+  transform: scaleX(-1);
+  opacity: 0.85;
+  pointer-events: none;
 }
 
 .mf-card-seal {
-  width: 50px;
-  height: 50px;
-  background: var(--mf-crimson-deep);
+  width: 58px;
+  height: 58px;
+  background: radial-gradient(circle at 35% 35%, #9E1F30 0%, #7A1622 60%, #4D0A13 100%);
   border-radius: 50%;
-  margin: 0 auto 20px auto;
+  margin: 0 auto 22px auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--mf-gold-light);
+  color: #F2D59B;
   font-family: var(--font-serif-display);
-  font-size: 1.5rem;
-  box-shadow: 0 4px 12px rgba(122, 22, 34, 0.4);
+  font-size: 1.6rem;
+  box-shadow: 0 6px 18px rgba(122, 22, 34, 0.45), 
+              inset 0 2px 4px rgba(255, 255, 255, 0.35), 
+              inset 0 -2px 4px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+  position: relative;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.mf-card-seal:hover {
+  transform: scale(1.08) rotate(5deg);
 }
 
 .mf-card-recipient-preview {
