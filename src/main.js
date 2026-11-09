@@ -1381,19 +1381,27 @@ document.addEventListener('keydown', (e) => {
 
 
 /* ==========================================================================
-   ATELIER AMBIENT AUDIO — "DILO CON FLORES"
+   ATELIER AMBIENT AUDIO — REPRODUCTOR RESILIENTE MÓVIL Y ESCRITORIO
    ========================================================================== */
 function initAtelierAudio() {
   const audioEl = document.getElementById('mf-atelier-audio');
   const headerBtn = document.getElementById('btn-audio-toggle');
   const heroBtn = document.getElementById('btn-hero-audio');
   const heroIcon = document.getElementById('hero-audio-state-icon');
+  const floatBtn = document.getElementById('btn-audio-float');
+  const floatStatus = document.getElementById('mf-audio-float-status');
+  const floatIcon = document.getElementById('mf-audio-float-icon-state');
   const toastEl = document.getElementById('mf-audio-toast');
   const toastMsg = document.getElementById('mf-audio-toast-msg');
 
   if (!audioEl) return;
 
-  // Set audio source with Vite base url compatibility & dual fallback
+  // Requisito 3: Compatibilidad iOS / Android (playsinline directo y volumen fijo a 0.3)
+  audioEl.setAttribute('playsinline', 'true');
+  audioEl.setAttribute('webkit-playsinline', 'true');
+  audioEl.volume = 0.3; // Nivel audible directo sin timers de fade-in congelables
+
+  // Rutas con fallback dinámico (Vite base url compatible)
   const audioBase = import.meta.env.BASE_URL.endsWith('/') 
     ? import.meta.env.BASE_URL 
     : import.meta.env.BASE_URL + '/';
@@ -1405,22 +1413,22 @@ function initAtelierAudio() {
     './public/audio/dilo-con-flores.mp3'
   ];
   let currentSourceIndex = 0;
-
   audioEl.src = sources[0];
-  audioEl.volume = 0.55;
+
+  let isPlaying = false;
+  let userMuted = false;
+  let hasStarted = false;
+  let toastTimeout = null;
 
   audioEl.addEventListener('error', () => {
     if (currentSourceIndex < sources.length - 1) {
       currentSourceIndex++;
       audioEl.src = sources[currentSourceIndex];
-      if (isPlaying) {
+      if (isPlaying && !userMuted) {
         audioEl.play().catch(() => {});
       }
     }
   });
-
-  let isPlaying = false;
-  let toastTimeout = null;
 
   function showToast(message) {
     if (!toastEl || !toastMsg) return;
@@ -1429,11 +1437,30 @@ function initAtelierAudio() {
     clearTimeout(toastTimeout);
     toastTimeout = setTimeout(() => {
       toastEl.classList.remove('show');
-    }, 3800);
+    }, 3200);
   }
 
   function updateUI(playing) {
     isPlaying = playing;
+
+    // Control flotante
+    if (floatBtn) {
+      if (playing) {
+        floatBtn.classList.add('playing');
+        floatBtn.classList.remove('muted');
+        if (floatStatus) floatStatus.textContent = 'Música On';
+        if (floatIcon) floatIcon.textContent = '❚❚';
+        floatBtn.setAttribute('title', 'Pausar música ambiental');
+      } else {
+        floatBtn.classList.remove('playing');
+        floatBtn.classList.add('muted');
+        if (floatStatus) floatStatus.textContent = 'Silencio';
+        if (floatIcon) floatIcon.textContent = '▶';
+        floatBtn.setAttribute('title', 'Reanudar música ambiental');
+      }
+    }
+
+    // Botón en Header
     if (headerBtn) {
       if (playing) {
         headerBtn.classList.add('playing');
@@ -1444,6 +1471,7 @@ function initAtelierAudio() {
       }
     }
 
+    // Botón en Hero
     if (heroBtn) {
       if (playing) {
         heroBtn.classList.add('playing');
@@ -1455,175 +1483,78 @@ function initAtelierAudio() {
     }
   }
 
-  function fadeInAudio(targetVolume = 0.55, durationMs = 1800) {
-    audioEl.volume = 0;
-    const stepTime = 50;
-    const stepIncrement = targetVolume / (durationMs / stepTime);
-    
-    const fadeTimer = setInterval(() => {
-      if (audioEl.paused) {
-        clearInterval(fadeTimer);
-        return;
-      }
-      if (audioEl.volume + stepIncrement >= targetVolume) {
-        audioEl.volume = targetVolume;
-        clearInterval(fadeTimer);
-      } else {
-        audioEl.volume = Math.min(targetVolume, audioEl.volume + stepIncrement);
-      }
-    }, stepTime);
+  // Requisito 1 & 2: Desbloqueo de autoplay y resiliencia de gestos
+  const gestureEvents = ['touchstart', 'pointerdown', 'scroll', 'click'];
+
+  function removeGestureListeners() {
+    gestureEvents.forEach(evt => {
+      window.removeEventListener(evt, handleGesture, { passive: true });
+      document.removeEventListener(evt, handleGesture, { passive: true });
+    });
   }
 
-  // Detección de dispositivo: Móvil vs PC/Desktop
-  const isMobile = (('ontouchstart' in window) || (navigator.maxTouchPoints > 0)) && window.innerWidth <= 768;
-
-  // Elementos del Modal de PC
-  const soundtrackOverlay = document.getElementById('soundtrack-modal-overlay');
-  const btnSoundtrackAccept = document.getElementById('btn-soundtrack-accept');
-  const btnSoundtrackDecline = document.getElementById('btn-soundtrack-decline');
-  const btnSoundtrackClose = document.getElementById('btn-soundtrack-close');
-
-  function openSoundtrackModal() {
-    if (soundtrackOverlay) {
-      soundtrackOverlay.classList.add('active');
-      soundtrackOverlay.setAttribute('aria-hidden', 'false');
+  function handleGesture() {
+    // Si el usuario decidió silenciarlo manualmente o ya está reproduciendo, no intervenir
+    if (userMuted || isPlaying || hasStarted) {
+      return;
     }
-  }
 
-  function closeSoundtrackModal() {
-    if (soundtrackOverlay) {
-      soundtrackOverlay.classList.remove('active');
-      soundtrackOverlay.setAttribute('aria-hidden', 'true');
-    }
-  }
+    // Intentar arrancar la reproducción
+    const playPromise = audioEl.play();
 
-  if (isMobile) {
-    // ----------------------------------------------------
-    // COMPORTAMIENTO MÓVIL: INICIA AL PRIMER SCROLL
-    // ----------------------------------------------------
-    let scrollTriggered = false;
-
-    async function triggerFirstScrollAudio() {
-      if (scrollTriggered || isPlaying) return;
-      scrollTriggered = true;
-
-      window.removeEventListener('scroll', handleMobileScroll);
-      window.removeEventListener('wheel', handleMobileScroll);
-      window.removeEventListener('touchmove', handleMobileScroll);
-
-      try {
-        audioEl.volume = 0;
-        await audioEl.play();
+    if (playPromise !== undefined) {
+      playPromise.then(() => {
+        // ÉXITO: Sólo aquí eliminamos los listeners
+        hasStarted = true;
         updateUI(true);
-        fadeInAudio(0.55, 1800);
+        removeGestureListeners();
         showToast('♪ Música del Atelier: “Dilo con flores”');
-      } catch (err) {
-        console.log('Mobile scroll audio waiting for user touch:', err);
-        const onFirstTouch = async () => {
-          if (!isPlaying) {
-            try {
-              audioEl.volume = 0;
-              await audioEl.play();
-              updateUI(true);
-              fadeInAudio(0.55, 1800);
-              showToast('♪ Música del Atelier: “Dilo con flores”');
-            } catch (e) {}
-          }
-          window.removeEventListener('touchend', onFirstTouch);
-          window.removeEventListener('click', onFirstTouch);
-        };
-        window.addEventListener('touchend', onFirstTouch, { once: true });
-        window.addEventListener('click', onFirstTouch, { once: true });
-      }
-    }
-
-    function handleMobileScroll() {
-      if (window.scrollY > 15) {
-        triggerFirstScrollAudio();
-      }
-    }
-
-    window.addEventListener('scroll', handleMobileScroll, { passive: true });
-    window.addEventListener('wheel', handleMobileScroll, { passive: true });
-    window.addEventListener('touchmove', handleMobileScroll, { passive: true });
-
-  } else {
-    // ----------------------------------------------------
-    // COMPORTAMIENTO PC / DESKTOP: POPUP DE BANDA SONORA
-    // ----------------------------------------------------
-    const alreadyAnswered = sessionStorage.getItem('mf_soundtrack_prompted');
-
-    if (!alreadyAnswered) {
-      // Mostrar popup elegante tras 1.2s en PC
-      setTimeout(() => {
-        if (!isPlaying) {
-          openSoundtrackModal();
-        }
-      }, 1200);
-    }
-
-    if (btnSoundtrackAccept) {
-      btnSoundtrackAccept.addEventListener('click', async () => {
-        sessionStorage.setItem('mf_soundtrack_prompted', 'true');
-        closeSoundtrackModal();
-        try {
-          audioEl.volume = 0;
-          await audioEl.play();
-          updateUI(true);
-          fadeInAudio(0.55, 1800);
-          showToast('♪ Reproduciendo en el Atelier: “Dilo con flores”');
-        } catch (e) {
-          console.warn('Playback error:', e);
-        }
-      });
-    }
-
-    if (btnSoundtrackDecline) {
-      btnSoundtrackDecline.addEventListener('click', () => {
-        sessionStorage.setItem('mf_soundtrack_prompted', 'true');
-        closeSoundtrackModal();
-      });
-    }
-
-    if (btnSoundtrackClose) {
-      btnSoundtrackClose.addEventListener('click', () => {
-        sessionStorage.setItem('mf_soundtrack_prompted', 'true');
-        closeSoundtrackModal();
-      });
-    }
-
-    if (soundtrackOverlay) {
-      soundtrackOverlay.addEventListener('click', (e) => {
-        if (e.target === soundtrackOverlay) {
-          sessionStorage.setItem('mf_soundtrack_prompted', 'true');
-          closeSoundtrackModal();
-        }
+      }).catch(err => {
+        // En caso de rechazo del navegador (scroll rápido o política de interacción),
+        // NO eliminamos los listeners para que el siguiente toque intente de nuevo.
+        console.log('Autoplay attempt deferred by browser, keeping gesture listeners active:', err);
       });
     }
   }
 
-  async function togglePlay() {
-    scrollTriggered = true;
-    try {
-      if (audioEl.paused) {
-        audioEl.volume = 0.55;
-        await audioEl.play();
+  // Suscribir eventos con { passive: true } en window y document
+  gestureEvents.forEach(evt => {
+    window.addEventListener(evt, handleGesture, { passive: true });
+    document.addEventListener(evt, handleGesture, { passive: true });
+  });
+
+  // Requisito 4: Control visible para pausar/reactivar respetando la decisión del usuario
+  function togglePlay() {
+    if (audioEl.paused) {
+      userMuted = false;
+      audioEl.play().then(() => {
+        hasStarted = true;
         updateUI(true);
+        removeGestureListeners();
         showToast('♪ Reproduciendo en el Atelier: “Dilo con flores”');
-      } else {
-        audioEl.pause();
-        updateUI(false);
-        showToast('Atelier en silencio');
-      }
-    } catch (err) {
-      console.warn('Autoplay prevented or audio playback error:', err);
+      }).catch(err => {
+        console.warn('Playback error:', err);
+      });
+    } else {
+      userMuted = true; // Respeta la pausa explícita del usuario: ningún gesto posterior lo reactiva
+      audioEl.pause();
       updateUI(false);
+      showToast('Atelier en silencio');
     }
+  }
+
+  if (floatBtn) {
+    floatBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      togglePlay();
+    });
   }
 
   if (headerBtn) {
     headerBtn.addEventListener('click', (e) => {
       e.preventDefault();
+      e.stopPropagation();
       togglePlay();
     });
   }
@@ -1631,6 +1562,7 @@ function initAtelierAudio() {
   if (heroBtn) {
     heroBtn.addEventListener('click', (e) => {
       e.preventDefault();
+      e.stopPropagation();
       togglePlay();
     });
   }
