@@ -52,6 +52,12 @@ class Store {
       address: 'Calzada del Valle 400, San Pedro Garza García'
     });
 
+    this.activePersonalization = this.loadFromStorage('mf_personalization', {
+      recipientName: 'Sofía Navarro',
+      cardMessage: 'Para la persona que ilumina cada uno de mis días. Con todo mi amor.',
+      addons: []
+    });
+
     this.listeners = new Map();
   }
 
@@ -133,6 +139,39 @@ class Store {
     this.cart = this.cart.filter(i => i.id !== itemId);
     this.saveToStorage('mf_cart', this.cart);
     this.notify('cart:updated', this.cart);
+  }
+
+  clearCart() {
+    this.cart = [];
+    this.coupon = null;
+    this.saveToStorage('mf_cart', this.cart);
+    this.saveToStorage('mf_coupon', null);
+    this.notify('cart:updated', this.cart);
+  }
+
+  // Guardar y sincronizar dedicatoria y complementos de Hazlo Personal
+  setPersonalization({ recipientName, cardMessage, addons = [] }) {
+    this.activePersonalization = {
+      recipientName: recipientName || 'Alguien Muy Especial',
+      cardMessage: cardMessage || 'Con todo mi afecto y admiración.',
+      addons: [...addons]
+    };
+    this.saveToStorage('mf_personalization', this.activePersonalization);
+
+    // Si hay productos en el carrito, actualizar el primer ítem o asociar los addons
+    if (this.cart.length > 0) {
+      this.cart[0].recipientName = this.activePersonalization.recipientName;
+      this.cart[0].cardMessage = this.activePersonalization.cardMessage;
+      this.cart[0].addons = [...this.activePersonalization.addons];
+      this.saveToStorage('mf_cart', this.cart);
+      this.notify('cart:updated', this.cart);
+    }
+    
+    // También actualizar orden en tracking para consistencia
+    this.orderTracking.recipientName = this.activePersonalization.recipientName;
+    this.saveToStorage('mf_order_tracking', this.orderTracking);
+    
+    this.notify('personalization:updated', this.activePersonalization);
   }
 
   getCartSubtotal() {

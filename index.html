@@ -540,13 +540,25 @@
 
         <div class="mf-personalize-grid">
           <!-- Vista Previa de Tarjeta en Vivo -->
-          <div class="mf-card-preview-live">
-            <div class="mf-card-seal">M</div>
-            <div class="mf-card-recipient-preview" id="live-recipient-preview">Para: Sofía Navarro</div>
-            <p class="mf-card-message-text" id="live-card-text">
-              “Para la persona que ilumina cada uno de mis días. Con todo mi amor.”
-            </p>
-            <div class="mf-card-sign">— Con la complicidad de Monsieur Flores</div>
+          <div>
+            <div class="mf-card-preview-live" id="card-preview-container">
+              <div class="mf-card-seal">M</div>
+              <div class="mf-card-recipient-preview" id="live-recipient-preview">Para: Sofía Navarro</div>
+              <p class="mf-card-message-text" id="live-card-text">
+                “Para la persona que ilumina cada uno de mis días. Con todo mi amor.”
+              </p>
+              <div class="mf-card-sign">— Con la complicidad de Monsieur Flores</div>
+            </div>
+
+            <!-- Acciones de la Carta de Lujo -->
+            <div style="display: flex; gap: 10px; margin-top: 14px; justify-content: center;">
+              <button class="btn-secondary" id="btn-download-card" style="padding: 10px 16px; font-size: 0.72rem; flex: 1;">
+                Descargar Carta (PNG)
+              </button>
+              <button class="btn-dark" id="btn-share-card-wa" style="padding: 10px 16px; font-size: 0.72rem; flex: 1;">
+                Enviar Dedicatoria por WhatsApp
+              </button>
+            </div>
           </div>
 
           <!-- Configurador de Addons & Mensaje -->
@@ -936,7 +948,10 @@
   <div class="mf-drawer-overlay" id="drawer-overlay"></div>
   <aside class="mf-drawer" id="cart-drawer">
     <div class="mf-drawer-header">
-      <h3 class="mf-drawer-title">Tu Carrito de Regalos</h3>
+      <div>
+        <h3 class="mf-drawer-title" style="margin-bottom: 2px;">Tu Carrito de Regalos</h3>
+        <button id="btn-clear-cart" style="background: none; border: none; color: var(--mf-text-muted); font-size: 0.72rem; text-decoration: underline; cursor: pointer; padding: 0;">Vaciar bolsa</button>
+      </div>
       <button class="mf-drawer-close" id="btn-close-cart">✕</button>
     </div>
     <div class="mf-drawer-body" id="cart-items-container">
@@ -1195,6 +1210,26 @@
       </div>
     </div>
   </div>
+
+  <!-- MODAL: LECTURA EDITORIAL DE CRÓNICAS DEL JOURNAL -->
+  <div class="mf-modal-wrap" id="journal-modal">
+    <div class="mf-modal-box mf-journal-modal-box">
+      <div class="mf-modal-header">
+        <div>
+          <span class="mf-eyebrow" id="journal-modal-category" style="margin-bottom: 2px;">Crónica de Atelier</span>
+          <h3 style="font-size: 1.45rem; line-height: 1.25;" id="journal-modal-title">Título de la Crónica</h3>
+          <span style="font-size: 0.76rem; color: var(--mf-gold-light); display: block; margin-top: 4px;" id="journal-modal-meta">Por Monsieur Flores</span>
+        </div>
+        <button class="mf-drawer-close" id="btn-close-journal" onclick="window.closeJournalModal();">✕</button>
+      </div>
+      <div class="mf-modal-body" style="padding: 26px 30px;" id="journal-modal-body">
+        <!-- Contenido inyectado dinámicamente -->
+      </div>
+    </div>
+  </div>
+
+  <!-- CANVAS OCULTO PARA EXPORTAR TARJETA CALIGRAFIADA EN ALTA RESOLUCIÓN -->
+  <canvas id="card-render-canvas" width="1200" height="750" style="display: none;"></canvas>
 
   <!-- CONTENEDOR GLOBAL DE TOASTS DE TERCIOPELO (REEMPLAZA A ALERT NATIVO) -->
   <div class="mf-toast-container" id="mf-toast-container" aria-live="polite"></div>

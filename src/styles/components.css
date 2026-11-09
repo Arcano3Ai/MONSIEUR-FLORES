@@ -3343,3 +3343,66 @@ main, section, header, footer {
     transform: translateY(0);
   }
 }
+
+/* ==========================================================================
+   20. MODAL DE LECTURA EDITORIAL (CRÓNICAS DE JOURNAL)
+   ========================================================================== */
+.mf-journal-modal-box {
+  max-width: 760px;
+  width: 100%;
+  max-height: 88vh;
+  background: #ffffff;
+  color: var(--mf-text-main);
+  border-radius: 4px;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--mf-border-gold);
+}
+
+.mf-journal-editorial-body {
+  font-size: 1.04rem;
+  line-height: 1.75;
+  color: #2c2f2c;
+  font-family: var(--font-sans);
+}
+
+.mf-journal-editorial-body h4 {
+  font-family: var(--font-serif-headline);
+  font-size: 1.35rem;
+  color: #121412;
+  margin: 28px 0 12px 0;
+}
+
+.mf-journal-editorial-body p {
+  margin-bottom: 16px;
+}
+
+.mf-journal-editorial-body ul {
+  padding-left: 20px;
+  margin-bottom: 20px;
+}
+
+.mf-journal-editorial-body li {
+  margin-bottom: 10px;
+}
+
+.mf-journal-editorial-body blockquote {
+  background: #fdfaf4;
+  border-left: 3px solid var(--mf-gold-primary);
+  padding: 20px 24px;
+  margin: 26px 0;
+  border-radius: 0 4px 4px 0;
+  font-family: var(--font-serif-display);
+  font-style: italic;
+  font-size: 1.25rem;
+  line-height: 1.45;
+  color: #1a1c1a;
+}
+
+.mf-journal-editorial-body blockquote cite {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--mf-gold-primary);
+  font-family: var(--font-serif-headline);
+  font-style: normal;
+  margin-top: 10px;
+}

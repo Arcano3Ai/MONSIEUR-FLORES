@@ -409,20 +409,34 @@ function initPersonalizer() {
   const liveRecipient = document.getElementById('live-recipient-preview');
   const liveMessage = document.getElementById('live-card-text');
 
+  // Inicializar con datos guardados si existen
+  if (store.activePersonalization) {
+    if (recipientInput) recipientInput.value = store.activePersonalization.recipientName || 'Sofía Navarro';
+    if (messageInput) messageInput.value = store.activePersonalization.cardMessage || 'Para la persona que ilumina cada uno de mis días. Con todo mi amor.';
+    if (liveRecipient) liveRecipient.textContent = `Para: ${recipientInput.value}`;
+    if (liveMessage) liveMessage.textContent = `“${messageInput.value}”`;
+  }
+
   if (recipientInput && liveRecipient) {
     recipientInput.addEventListener('input', (e) => {
-      liveRecipient.textContent = `Para: ${e.target.value.trim() || 'Alguien Muy Especial'}`;
+      const val = e.target.value.trim() || 'Alguien Muy Especial';
+      liveRecipient.textContent = `Para: ${val}`;
+      store.activePersonalization.recipientName = val;
     });
   }
 
   if (messageInput && liveMessage) {
     messageInput.addEventListener('input', (e) => {
-      liveMessage.textContent = e.target.value.trim() ? `“${e.target.value}”` : '“Escribe tu mensaje con el corazón...”';
+      const val = e.target.value.trim() || 'Escribe tu mensaje con el corazón...';
+      liveMessage.textContent = `“${val}”`;
+      store.activePersonalization.cardMessage = val;
     });
   }
 
-  // Render addons
+  // Render addons con selección real
   const addonsList = document.getElementById('addons-list');
+  let selectedAddons = [];
+
   if (addonsList) {
     addonsList.innerHTML = ADDONS.map(addon => `
       <div class="mf-addon-item" data-addon-id="${addon.id}">
@@ -434,24 +448,64 @@ function initPersonalizer() {
           </div>
         </div>
         <div style="text-align: right;">
-          <div class="mf-addon-price">+$${addon.price} MXN</div>
-          <span style="font-size: 0.75rem; color: var(--mf-gold-primary); font-weight: 600;">Seleccionar</span>
+          <div class="mf-addon-price">+${store.formatPrice(addon.price)}</div>
+          <span class="mf-addon-action" style="font-size: 0.75rem; color: var(--mf-gold-primary); font-weight: 600;">Seleccionar</span>
         </div>
       </div>
     `).join('');
 
     addonsList.querySelectorAll('.mf-addon-item').forEach(item => {
       item.addEventListener('click', () => {
+        const id = item.getAttribute('data-addon-id');
+        const addonObj = ADDONS.find(a => a.id === id);
         item.classList.toggle('selected');
         const isSelected = item.classList.contains('selected');
-        item.querySelector('.mf-addon-price + span').textContent = isSelected ? '✓ Agregado' : 'Seleccionar';
+        const actionSpan = item.querySelector('.mf-addon-action');
+        if (actionSpan) actionSpan.textContent = isSelected ? '✓ Agregado' : 'Seleccionar';
+
+        if (isSelected && addonObj) {
+          if (!selectedAddons.some(a => a.id === id)) selectedAddons.push(addonObj);
+        } else {
+          selectedAddons = selectedAddons.filter(a => a.id !== id);
+        }
       });
     });
   }
 
+  // Guardar y sincronizar personalización real en el carrito y checkout
   document.getElementById('btn-save-personalization')?.addEventListener('click', () => {
-    alert('✓ Personalización guardada con éxito por Monsieur Flores. Se incluirá caligrafiada en tu próximo ramo.');
+    const recName = recipientInput?.value.trim() || 'Alguien Muy Especial';
+    const cardMsg = messageInput?.value.trim() || 'Para la persona que ilumina cada uno de mis días. Con todo mi amor.';
+
+    store.setPersonalization({
+      recipientName: recName,
+      cardMessage: cardMsg,
+      addons: selectedAddons
+    });
+
+    const addonsText = selectedAddons.length > 0 
+      ? ` y ${selectedAddons.length} complemento(s) gourmet de atelier` 
+      : '';
+
+    showVelvetToast(
+      'Personalización de Autor Guardada',
+      `Carta manuscrita para ${recName}${addonsText} adjuntados a tu pedido con éxito.`
+    );
+
+    // Abrir el carrito para que el cliente constate la personalización y los complementos
+    setTimeout(() => {
+      const cartDrawer = document.getElementById('cart-drawer');
+      const overlay = document.getElementById('drawer-overlay');
+      if (cartDrawer && overlay) {
+        overlay.classList.add('active');
+        cartDrawer.classList.add('active');
+        renderCartDrawer();
+      }
+    }, 600);
   });
+
+  // Inicializar descarga y compartir de carta digital en alta resolución
+  initCardDownloadAndShare();
 }
 
 /* ==========================================================================
@@ -541,7 +595,7 @@ function renderJournal() {
   if (!grid) return;
 
   grid.innerHTML = JOURNAL_ARTICLES.map(art => `
-    <article class="mf-journal-card">
+    <article class="mf-journal-card" data-journal-id="${art.id}" style="cursor: pointer;">
       <div class="mf-journal-img-wrap">
         <img src="${art.image}" alt="${art.title}" class="mf-journal-img" loading="lazy">
       </div>
@@ -549,15 +603,68 @@ function renderJournal() {
         <div class="mf-journal-meta">${art.category} · ${art.readTime}</div>
         <h3 class="mf-journal-title">${art.title}</h3>
         <p class="mf-journal-excerpt">${art.excerpt}</p>
-        <span style="color: var(--mf-gold-primary); font-weight: 600; font-size: 0.85rem;">Leer Crónica →</span>
+        <span style="color: var(--mf-gold-primary); font-weight: 600; font-size: 0.85rem;">Leer Crónica Completa →</span>
       </div>
     </article>
   `).join('');
 
+  grid.querySelectorAll('.mf-journal-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const artId = card.getAttribute('data-journal-id');
+      window.openJournalModal(artId);
+    });
+  });
+
   document.getElementById('btn-view-all-journal')?.addEventListener('click', () => {
-    alert('Próximamente: Guía Botánica Completa de Monsieur Flores — Edición Otoño/Invierno.');
+    showVelvetToast(
+      'Edición Especial de Monsieur Flores',
+      'El Compendio Botánico Otoño/Invierno está en imprenta sobre papel de algodón. Estará disponible el próximo mes.'
+    );
   });
 }
+
+window.openJournalModal = function(artId) {
+  const art = JOURNAL_ARTICLES.find(a => a.id === artId) || JOURNAL_ARTICLES[0];
+  const modal = document.getElementById('journal-modal');
+  const overlay = document.getElementById('drawer-overlay');
+  const catEl = document.getElementById('journal-modal-category');
+  const titleEl = document.getElementById('journal-modal-title');
+  const metaEl = document.getElementById('journal-modal-meta');
+  const bodyEl = document.getElementById('journal-modal-body');
+
+  if (!modal || !overlay || !bodyEl) return;
+
+  if (catEl) catEl.textContent = `${art.category} · ${art.readTime}`;
+  if (titleEl) titleEl.textContent = art.title;
+  if (metaEl) metaEl.textContent = `Por ${art.author} · Publicado en ${art.date}`;
+
+  bodyEl.innerHTML = `
+    <div style="margin-bottom: 24px; border-radius: 4px; overflow: hidden; max-height: 280px; box-shadow: var(--shadow-sm);">
+      <img src="${art.image}" alt="${art.title}" style="width: 100%; height: 100%; object-fit: cover;">
+    </div>
+    <div class="mf-journal-editorial-body">
+      ${art.content || `<p>${art.excerpt}</p>`}
+    </div>
+    <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--mf-border-light); display: flex; justify-content: space-between; align-items: center; flex-wrap: gap: 12px;">
+      <span style="font-size: 0.82rem; color: var(--mf-text-muted);">¿Te inspiró esta lectura?</span>
+      <button class="btn-primary" onclick="window.closeJournalModal(); document.getElementById('seleccion').scrollIntoView({behavior: 'smooth'});">
+        Explorar la Selección de Monsieur →
+      </button>
+    </div>
+  `;
+
+  overlay.classList.add('active');
+  modal.classList.add('active');
+  document.body.classList.add('mf-modal-open');
+};
+
+window.closeJournalModal = function() {
+  const modal = document.getElementById('journal-modal');
+  const overlay = document.getElementById('drawer-overlay');
+  modal?.classList.remove('active');
+  overlay?.classList.remove('active');
+  document.body.classList.remove('mf-modal-open');
+};
 
 /* ==========================================================================
    DRAWERS (CARRITO & FAVORITOS) & MODALES
@@ -575,10 +682,18 @@ function initDrawersAndModals() {
     favDrawer.classList.remove('active');
     checkoutModal.classList.remove('active');
     prodModal.classList.remove('active');
+    document.getElementById('journal-modal')?.classList.remove('active');
     document.body.classList.remove('mf-modal-open');
   }
 
   overlay.addEventListener('click', closeAll);
+
+  // Vaciar carrito
+  document.getElementById('btn-clear-cart')?.addEventListener('click', () => {
+    if (store.cart.length === 0) return;
+    store.clearCart();
+    showVelvetToast('Bolsa de Atelier', 'Has vaciado tu bolsa de compras.');
+  });
 
   // Cart Drawer triggers
   document.getElementById('btn-cart-open')?.addEventListener('click', () => {
@@ -982,27 +1097,42 @@ function openCheckoutModal(step = 1) {
       document.getElementById('btn-chk-to-4')?.addEventListener('click', () => renderStep(4));
     } else if (curStep === 4) {
       title.textContent = 'Paso 4 de 5: Dedicatoria y Sello en Cera';
+      const liveMsg = store.activePersonalization?.cardMessage || 'Para la persona que ilumina cada uno de mis días. Con todo mi amor.';
+      const liveRec = store.activePersonalization?.recipientName || 'Sofía Navarro';
+
       body.innerHTML = `
         <div style="display: flex; flex-direction: column; gap: 16px;">
           <div style="background: #fdfaf4; padding: 24px; border: 1px solid #e7d5be; border-radius: var(--radius-md); text-align: center;">
             <div style="width: 44px; height: 44px; background: var(--mf-crimson-deep); border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto; font-family: var(--font-serif-display); font-size: 1.3rem;">M</div>
-            <p style="font-family: var(--font-serif-display); font-style: italic; font-size: 1.25rem;">
-              “Para la persona que ilumina cada uno de mis días. Con todo mi amor.”
+            <div style="font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--mf-gold-primary); font-weight: 600; margin-bottom: 8px;">
+              Para: <span id="chk-card-recipient-label">${liveRec}</span>
+            </div>
+            <p style="font-family: var(--font-serif-display); font-style: italic; font-size: 1.25rem;" id="chk-card-message-preview">
+              “${liveMsg}”
             </p>
             <span style="font-size: 0.75rem; color: var(--mf-text-muted); display: block; margin-top: 10px;">
-              Caligrafiado a mano en papel de algodón de 300g con lacre granate
+              Caligrafiado a mano en papel de algodón de 300g con lacre granate y sello de Monsieur
             </span>
           </div>
           <div>
-            <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px;">¿Deseas modificar las palabras?</label>
-            <input type="text" class="mf-input-field" style="color: black; background: #f8f9f8; border: 1px solid #ccc; width: 100%;" value="Para la persona que ilumina cada uno de mis días. Con todo mi amor.">
+            <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px;">¿Deseas modificar las palabras de tu carta?</label>
+            <input type="text" id="chk-card-edit-input" class="mf-input-field" style="color: black; background: #f8f9f8; border: 1px solid #ccc; width: 100%;" value="${liveMsg}">
           </div>
           <div style="display: flex; justify-content: space-between; margin-top: 14px;">
             <button class="btn-dark" id="btn-chk-back-3">← Volver</button>
-            <button class="btn-primary" id="btn-chk-to-5">Continuar al Pago Seguro ($${total.toLocaleString('es-MX')} MXN) →</button>
+            <button class="btn-primary" id="btn-chk-to-5">Continuar al Pago Seguro (${store.formatPrice(store.getCartTotal())}) →</button>
           </div>
         </div>
       `;
+
+      const editInput = document.getElementById('chk-card-edit-input');
+      const previewText = document.getElementById('chk-card-message-preview');
+      editInput?.addEventListener('input', (e) => {
+        const val = e.target.value.trim() || 'Escribe tus palabras...';
+        if (previewText) previewText.textContent = `“${val}”`;
+        store.activePersonalization.cardMessage = val;
+      });
+
       document.getElementById('btn-chk-back-3')?.addEventListener('click', () => renderStep(3));
       document.getElementById('btn-chk-to-5')?.addEventListener('click', () => renderStep(5));
     } else if (curStep === 5) {
@@ -2024,4 +2154,167 @@ function initServiceWorker() {
       });
     });
   }
+}
+
+/* ==========================================================================
+   DESCARGA Y COMPARTIR DE CARTA CALIGRAFIADA (CANVAS 1200x750)
+   ========================================================================== */
+function initCardDownloadAndShare() {
+  const downloadBtn = document.getElementById('btn-download-card');
+  const shareWaBtn = document.getElementById('btn-share-card-wa');
+  const canvas = document.getElementById('card-render-canvas');
+
+  if (downloadBtn && canvas) {
+    downloadBtn.addEventListener('click', () => {
+      renderCardToCanvas(canvas);
+      try {
+        const dataUrl = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.download = `Carta-Dedicatoria-Monsieur-Flores.png`;
+        link.href = dataUrl;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showVelvetToast('Carta de Atelier Descargada', 'Tu tarjeta en papel de algodón con sello de lacre ha sido guardada en alta resolución.');
+      } catch (err) {
+        console.warn('Error al exportar canvas:', err);
+        showVelvetToast('Exportación Digital', 'Tu mensaje ha sido grabado. Lista para ser caligrafiada en tu encargo.');
+      }
+    });
+  }
+
+  if (shareWaBtn) {
+    shareWaBtn.addEventListener('click', () => {
+      const rec = store.activePersonalization?.recipientName || 'Alguien Muy Especial';
+      const msg = store.activePersonalization?.cardMessage || 'Para la persona que ilumina cada uno de mis días.';
+      const waText = `*Carta Caligrafiada de Monsieur Flores*\n\n_Para: ${rec}_\n\n“${msg}”\n\n— _Con la complicidad de Monsieur Flores · Haute Floristerie_\nhttps://arcano3ai.github.io/MONSIEUR-FLORES/`;
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(waText)}`, '_blank');
+    });
+  }
+}
+
+function renderCardToCanvas(canvas) {
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width;
+  const h = canvas.height;
+
+  const rec = store.activePersonalization?.recipientName || 'Alguien Muy Especial';
+  const msg = store.activePersonalization?.cardMessage || 'Para la persona que ilumina cada uno de mis días. Con todo mi amor.';
+
+  // 1. Fondo de papel de algodón hecho a mano
+  const grad = ctx.createRadialGradient(w / 2, h / 2, 80, w / 2, h / 2, w / 1.5);
+  grad.addColorStop(0, '#FCFAF7');
+  grad.addColorStop(1, '#F4ECE1');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, w, h);
+
+  // 2. Doble Marco Perimetral en Oro
+  ctx.strokeStyle = '#C5A059';
+  ctx.lineWidth = 3;
+  ctx.strokeRect(36, 36, w - 72, h - 72);
+
+  ctx.strokeStyle = 'rgba(197, 160, 89, 0.45)';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(46, 46, w - 92, h - 92);
+
+  // 3. Esquinas Ornamentales Clásicas
+  drawCornerFiligree(ctx, 48, 48, 1, 1);
+  drawCornerFiligree(ctx, w - 48, 48, -1, 1);
+  drawCornerFiligree(ctx, 48, h - 48, 1, -1);
+  drawCornerFiligree(ctx, w - 48, h - 48, -1, -1);
+
+  // 4. Sello de Lacre Carmesí 3D Superior
+  const sealX = w / 2;
+  const sealY = 135;
+  const sealR = 48;
+
+  // Sombra del sello
+  ctx.save();
+  ctx.shadowColor = 'rgba(122, 22, 34, 0.4)';
+  ctx.shadowBlur = 18;
+  ctx.shadowOffsetY = 6;
+
+  const sealGrad = ctx.createRadialGradient(sealX - 12, sealY - 12, 6, sealX, sealY, sealR);
+  sealGrad.addColorStop(0, '#9E1F30');
+  sealGrad.addColorStop(0.6, '#7A1622');
+  sealGrad.addColorStop(1, '#4A0A12');
+  ctx.fillStyle = sealGrad;
+  ctx.beginPath();
+  ctx.arc(sealX, sealY, sealR, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  // Borde fino de oro en el sello
+  ctx.strokeStyle = 'rgba(212, 175, 55, 0.5)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(sealX, sealY, sealR - 4, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Monograma "M" repujado
+  ctx.fillStyle = '#F2D59B';
+  ctx.font = 'bold 44px "Playfair Display", Georgia, serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('M', sealX, sealY + 2);
+
+  // 5. Destinatario
+  ctx.fillStyle = '#C5A059';
+  ctx.font = '600 22px "Plus Jakarta Sans", sans-serif';
+  ctx.letterSpacing = '4px';
+  ctx.textAlign = 'center';
+  ctx.fillText(`PARA: ${rec.toUpperCase()}`, w / 2, 245);
+
+  // 6. Mensaje Caligrafiado (Con ajuste automático de líneas)
+  ctx.fillStyle = '#181A18';
+  ctx.font = 'italic 36px "Playfair Display", Georgia, serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  const maxLineWidth = w - 240;
+  const words = `“${msg}”`.split(' ');
+  const lines = [];
+  let currentLine = '';
+
+  words.forEach(word => {
+    const testLine = currentLine ? `${currentLine} ${word}` : word;
+    const metrics = ctx.measureText(testLine);
+    if (metrics.width > maxLineWidth) {
+      lines.push(currentLine);
+      currentLine = word;
+    } else {
+      currentLine = testLine;
+    }
+  });
+  if (currentLine) lines.push(currentLine);
+
+  const startY = 360 - (lines.length - 1) * 26;
+  lines.forEach((line, idx) => {
+    ctx.fillText(line, w / 2, startY + idx * 56);
+  });
+
+  // 7. Firma de Monsieur Flores en el pie
+  ctx.fillStyle = '#787068';
+  ctx.font = '500 20px "Cormorant Garamond", Georgia, serif';
+  ctx.fillText('— Con la complicidad de Monsieur Flores · Haute Floristerie —', w / 2, h - 90);
+}
+
+function drawCornerFiligree(ctx, x, y, scaleX, scaleY) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(scaleX, scaleY);
+  ctx.strokeStyle = '#C5A059';
+  ctx.lineWidth = 1.2;
+
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(40, 0);
+  ctx.moveTo(0, 0);
+  ctx.lineTo(0, 40);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(14, 14, 6, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
 }
