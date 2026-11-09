@@ -1396,12 +1396,12 @@ function initAtelierAudio() {
 
   if (!audioEl) return;
 
-  // Requisito 3: Compatibilidad iOS / Android (playsinline directo y volumen fijo a 0.3)
+  // Requisito 3: Compatibilidad iOS / Android (playsinline directo y volumen fijo)
   audioEl.setAttribute('playsinline', 'true');
   audioEl.setAttribute('webkit-playsinline', 'true');
-  audioEl.volume = 0.3; // Nivel audible directo sin timers de fade-in congelables
+  audioEl.volume = 0.35; // Nivel audible calibrado
 
-  // Rutas con fallback dinámico (Vite base url compatible)
+  // Asignar fuente si no está precargada en HTML
   const audioBase = import.meta.env.BASE_URL.endsWith('/') 
     ? import.meta.env.BASE_URL 
     : import.meta.env.BASE_URL + '/';
@@ -1413,7 +1413,10 @@ function initAtelierAudio() {
     './public/audio/dilo-con-flores.mp3'
   ];
   let currentSourceIndex = 0;
-  audioEl.src = sources[0];
+
+  if (!audioEl.src && !audioEl.currentSrc) {
+    audioEl.src = sources[0];
+  }
 
   let isPlaying = false;
   let userMuted = false;
@@ -1454,9 +1457,9 @@ function initAtelierAudio() {
       } else {
         floatBtn.classList.remove('playing');
         floatBtn.classList.add('muted');
-        if (floatStatus) floatStatus.textContent = 'Silencio';
+        if (floatStatus) floatStatus.textContent = 'Música';
         if (floatIcon) floatIcon.textContent = '▶';
-        floatBtn.setAttribute('title', 'Reanudar música ambiental');
+        floatBtn.setAttribute('title', 'Iniciar música ambiental');
       }
     }
 
@@ -1467,7 +1470,7 @@ function initAtelierAudio() {
         headerBtn.setAttribute('title', 'Pausar música del Atelier');
       } else {
         headerBtn.classList.remove('playing');
-        headerBtn.setAttribute('title', 'Reproducir: Dilo con flores');
+        headerBtn.setAttribute('title', 'Reproducir música del Atelier');
       }
     }
 
@@ -1483,47 +1486,42 @@ function initAtelierAudio() {
     }
   }
 
-  // Requisito 1 & 2: Desbloqueo de autoplay y resiliencia de gestos
-  const gestureEvents = ['touchstart', 'pointerdown', 'scroll', 'click'];
+  // Desbloqueo universal en primer gesto (Touchstart, Touchend, Pointerdown, Click, Scroll)
+  const gestureEvents = ['touchstart', 'touchend', 'click', 'pointerdown', 'scroll'];
 
   function removeGestureListeners() {
     gestureEvents.forEach(evt => {
-      window.removeEventListener(evt, handleGesture, { passive: true });
-      document.removeEventListener(evt, handleGesture, { passive: true });
+      window.removeEventListener(evt, attemptAutoPlay, { passive: true });
+      document.removeEventListener(evt, attemptAutoPlay, { passive: true });
     });
   }
 
-  function handleGesture() {
-    // Si el usuario decidió silenciarlo manualmente o ya está reproduciendo, no intervenir
+  function attemptAutoPlay() {
     if (userMuted || isPlaying || hasStarted) {
       return;
     }
 
-    // Intentar arrancar la reproducción
     const playPromise = audioEl.play();
-
     if (playPromise !== undefined) {
       playPromise.then(() => {
-        // ÉXITO: Sólo aquí eliminamos los listeners
         hasStarted = true;
         updateUI(true);
-        removeGestureListeners();
+        removeGestureListeners(); // Se eliminan únicamente al confirmar reproducción
         showToast('♪ Música del Atelier: “Dilo con flores”');
-      }).catch(err => {
-        // En caso de rechazo del navegador (scroll rápido o política de interacción),
-        // NO eliminamos los listeners para que el siguiente toque intente de nuevo.
-        console.log('Autoplay attempt deferred by browser, keeping gesture listeners active:', err);
+      }).catch(() => {
+        // En iOS Safari / Chrome móvil, si se rechaza por scroll pasivo,
+        // los listeners permanecen 100% activos para el siguiente toque.
       });
     }
   }
 
-  // Suscribir eventos con { passive: true } en window y document
+  // Suscribir eventos con { passive: true }
   gestureEvents.forEach(evt => {
-    window.addEventListener(evt, handleGesture, { passive: true });
-    document.addEventListener(evt, handleGesture, { passive: true });
+    window.addEventListener(evt, attemptAutoPlay, { passive: true });
+    document.addEventListener(evt, attemptAutoPlay, { passive: true });
   });
 
-  // Requisito 4: Control visible para pausar/reactivar respetando la decisión del usuario
+  // Alternar reproducción respetando la decisión del usuario
   function togglePlay() {
     if (audioEl.paused) {
       userMuted = false;
@@ -1536,7 +1534,7 @@ function initAtelierAudio() {
         console.warn('Playback error:', err);
       });
     } else {
-      userMuted = true; // Respeta la pausa explícita del usuario: ningún gesto posterior lo reactiva
+      userMuted = true; // Pausa manual explícita
       audioEl.pause();
       updateUI(false);
       showToast('Atelier en silencio');

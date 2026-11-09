@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
   <title>MONSIEUR FLORES — El arte de decirlo con flores | Boutique Floral Premium</title>
   
   <meta name="description" content="Boutique floral de lujo. Dime qué quieres decir y Monsieur Flores encontrará la manera de expresarlo con flores. Envío de ramos y arreglos florales de autor a domicilio el mismo día.">
@@ -922,7 +922,10 @@
   </div>
 
   <!-- REPRODUCTOR AMBIENTAL DE ALTA COSTURA: "DILO CON FLORES" -->
-  <audio id="mf-atelier-audio" loop preload="auto" playsinline="true" webkit-playsinline="true"></audio>
+  <audio id="mf-atelier-audio" loop preload="auto" playsinline="true" webkit-playsinline="true">
+    <source src="./audio/dilo-con-flores.mp3" type="audio/mpeg">
+    <source src="./public/audio/dilo-con-flores.mp3" type="audio/mpeg">
+  </audio>
 
   <!-- CONTROL FLOTANTE DE MÚSICA AMBIENTAL (RESPONSIVE: bottom-20 en móvil, md:bottom-6 en desktop) -->
   <button class="mf-audio-float-control" id="btn-audio-float" aria-label="Control de música ambiental" title="Música ambiental: Dilo con flores">
