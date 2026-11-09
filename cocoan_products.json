@@ -1,0 +1,737 @@
+{
+  "products": [
+    {
+      "product_id": 9451,
+      "product_name": "Cluster bundle",
+      "message": "Limited Edition",
+      "price": 250,
+      "size": "10 clusters",
+      "price_gram": null
+    },
+    {
+      "product_id": 8908,
+      "product_name": "Gorra Choco-Club",
+      "message": "¡Nueva!",
+      "price": 280,
+      "size": "1 pieza",
+      "price_gram": null
+    },
+    {
+      "product_id": 9140,
+      "product_name": "Tortubox + Crunch Bars",
+      "message": "Limited Edition",
+      "price": 380,
+      "size": "1 kit",
+      "price_gram": null
+    },
+    {
+      "product_id": 9139,
+      "product_name": "Toffee + Tortubites",
+      "message": "Best Seller",
+      "price": 425,
+      "size": "1 kit",
+      "price_gram": null
+    },
+    {
+      "product_id": 9368,
+      "product_name": "Chocolate Dubai",
+      "message": "¡Fan favorite!",
+      "price": 490,
+      "size": "160 gramos",
+      "price_gram": null
+    },
+    {
+      "product_id": 8840,
+      "product_name": "Medio Litro - Double Trouble",
+      "message": null,
+      "price": 190,
+      "size": "16 onzas",
+      "price_gram": null
+    },
+    {
+      "product_id": 8841,
+      "product_name": "Medio Litro - Chocochunks",
+      "message": null,
+      "price": 190,
+      "size": "16 onzas",
+      "price_gram": null
+    },
+    {
+      "product_id": 8842,
+      "product_name": "Medio Litro - Chocomisú",
+      "message": null,
+      "price": 190,
+      "size": "16 onzas",
+      "price_gram": null
+    },
+    {
+      "product_id": 8839,
+      "product_name": "Medio Litro - Berry Crunch",
+      "message": null,
+      "price": 190,
+      "size": "16 onzas",
+      "price_gram": null
+    },
+    {
+      "product_id": 8940,
+      "product_name": "Medio litro - Milky Flakes",
+      "message": null,
+      "price": 190,
+      "size": "16 onzas",
+      "price_gram": null
+    },
+    {
+      "product_id": 8941,
+      "product_name": "Medio litro - Mangococo",
+      "message": null,
+      "price": 190,
+      "size": "16 onzas",
+      "price_gram": null
+    },
+    {
+      "product_id": 8909,
+      "product_name": "Gelato Rocky Toffee",
+      "message": null,
+      "price": 95,
+      "size": "8 onzas",
+      "price_gram": null
+    },
+    {
+      "product_id": 8960,
+      "product_name": "Sorbete Fruit Punch",
+      "message": "¡Nuevo!",
+      "price": 95,
+      "size": "8 onzas",
+      "price_gram": null
+    },
+    {
+      "product_id": 9077,
+      "product_name": "Chocobox",
+      "message": "¡Más vendido!",
+      "price": 845,
+      "size": "1 caja",
+      "price_gram": null
+    },
+    {
+      "product_id": 8766,
+      "product_name": "Sampler box",
+      "message": "¡Más vendido!",
+      "price": 180,
+      "size": "8 mini tabletas",
+      "price_gram": null
+    },
+    {
+      "product_id": 8480,
+      "product_name": "Chocolate de origen — Santander 85%",
+      "message": null,
+      "price": 190,
+      "size": "100 gramos",
+      "price_gram": 1.9
+    },
+    {
+      "product_id": 8643,
+      "product_name": "Chocolate de origen — Frutos Secos 70%",
+      "message": "¡Más vendido!",
+      "price": 190,
+      "size": "100 gramos",
+      "price_gram": 1.9
+    },
+    {
+      "product_id": 8394,
+      "product_name": "Chocolate 58% — Goji Berry",
+      "message": "¡Más vendido!",
+      "price": 190,
+      "size": "100 gramos",
+      "price_gram": 1.9
+    },
+    {
+      "product_id": 8395,
+      "product_name": "Chocolate 58% — Libre de azúcar",
+      "message": "Keto-Friendly",
+      "price": 190,
+      "size": "100 gramos",
+      "price_gram": 1.9
+    },
+    {
+      "product_id": 8398,
+      "product_name": "Chocolate 58% — Toffee",
+      "message": "¡Más vendido!",
+      "price": 190,
+      "size": "100 gramos",
+      "price_gram": 1.9
+    },
+    {
+      "product_id": 8396,
+      "product_name": "Chocolate de leche + Praliné de Avellanas",
+      "message": null,
+      "price": 190,
+      "size": "100 gramos",
+      "price_gram": 1.9
+    },
+    {
+      "product_id": 8397,
+      "product_name": "Chocolate de leche + Cereal",
+      "message": null,
+      "price": 190,
+      "size": "100 gramos",
+      "price_gram": 1.9
+    },
+    {
+      "product_id": 8501,
+      "product_name": "Tableta grande — Santander 85%",
+      "message": null,
+      "price": 165,
+      "size": "80 gramos",
+      "price_gram": null
+    },
+    {
+      "product_id": 8401,
+      "product_name": "Tableta grande — Arauca 70%",
+      "message": "¡Más vendido!",
+      "price": 165,
+      "size": "80 gramos",
+      "price_gram": null
+    },
+    {
+      "product_id": 8810,
+      "product_name": "Tableta grande — Frutos Secos 70%",
+      "message": null,
+      "price": 165,
+      "size": "80 gramos",
+      "price_gram": null
+    },
+    {
+      "product_id": 8402,
+      "product_name": "Tableta grande — Almendras 65%",
+      "message": null,
+      "price": 165,
+      "size": "80 gramos",
+      "price_gram": null
+    },
+    {
+      "product_id": 9128,
+      "product_name": "Tortubox 2 piezas",
+      "message": "",
+      "price": 70,
+      "size": "2 piezas",
+      "price_gram": null
+    },
+    {
+      "product_id": 8594,
+      "product_name": "Tableta grande — Frutos rojos 65%",
+      "message": "¡Más vendido!",
+      "price": 165,
+      "size": "80 gramos",
+      "price_gram": null
+    },
+    {
+      "product_id": 9129,
+      "product_name": "Tortubox 4 piezas",
+      "message": "¡Más vendido!",
+      "price": 140,
+      "size": "4 piezas",
+      "price_gram": null
+    },
+    {
+      "product_id": 8403,
+      "product_name": "Tableta grande — Goji Berry  58%",
+      "message": null,
+      "price": 165,
+      "size": "80 gramos",
+      "price_gram": null
+    },
+    {
+      "product_id": 8489,
+      "product_name": "Tableta grande — Libre de azúcar 58%",
+      "message": "Keto-Friendly",
+      "price": 165,
+      "size": "80 gramos",
+      "price_gram": null
+    },
+    {
+      "product_id": 9130,
+      "product_name": "Tortubox 8 piezas",
+      "message": "¡Más vendido!",
+      "price": 280,
+      "size": "8 piezas",
+      "price_gram": null
+    },
+    {
+      "product_id": 8405,
+      "product_name": "Tableta grande —  Praliné 41%",
+      "message": "¡Más vendido!",
+      "price": 165,
+      "size": "80 gramos",
+      "price_gram": null
+    },
+    {
+      "product_id": 8406,
+      "product_name": "Tableta grande — Velvet",
+      "message": null,
+      "price": 165,
+      "size": "80 gramos",
+      "price_gram": null
+    },
+    {
+      "product_id": 8876,
+      "product_name": "Megabox 25 Fresas – Chocolate amargo",
+      "message": "Consume el mismo día de entrega",
+      "price": 950,
+      "size": "25 piezas",
+      "price_gram": null
+    },
+    {
+      "product_id": 8470,
+      "product_name": "Tableta grande — Matcha",
+      "message": null,
+      "price": 165,
+      "size": "80 gramos",
+      "price_gram": null
+    },
+    {
+      "product_id": 9080,
+      "product_name": "Megabox 25 Fresas – Chocolate de leche",
+      "message": "Consume el mismo día de entrega",
+      "price": 950,
+      "size": "25 fresas",
+      "price_gram": null
+    },
+    {
+      "product_id": 8528,
+      "product_name": "Tableta chica — Santander 85%",
+      "message": null,
+      "price": 85,
+      "size": "40 gramos",
+      "price_gram": null
+    },
+    {
+      "product_id": 9079,
+      "product_name": "Megabox 25 Fresas – Amargo y leche",
+      "message": "Consume el mismo día de entrega",
+      "price": 950,
+      "size": "25 fresas",
+      "price_gram": null
+    },
+    {
+      "product_id": 9004,
+      "product_name": "Crunch Bar Box",
+      "message": null,
+      "price": 240,
+      "size": "3 piezas",
+      "price_gram": null
+    },
+    {
+      "product_id": 9334,
+      "product_name": "Bundle set",
+      "message": "",
+      "price": 550,
+      "size": "Kit",
+      "price_gram": null
+    },
+    {
+      "product_id": 9131,
+      "product_name": "Confiteria Mix",
+      "message": null,
+      "price": 230,
+      "size": "4 piezas",
+      "price_gram": null
+    },
+    {
+      "product_id": 9438,
+      "product_name": "Gift board",
+      "message": "",
+      "price": 730,
+      "size": "",
+      "price_gram": null
+    },
+    {
+      "product_id": 9322,
+      "product_name": "Bundle de 18 fresas - Chocolate de leche",
+      "message": "Consume el mismo día de entrega",
+      "price": 540,
+      "size": "18 fresas",
+      "price_gram": null
+    },
+    {
+      "product_id": 8809,
+      "product_name": "Tableta chica — Frutos Secos 70%",
+      "message": null,
+      "price": 85,
+      "size": "40 gramos",
+      "price_gram": null
+    },
+    {
+      "product_id": 8529,
+      "product_name": "Tableta chica — Arauca 70%",
+      "message": null,
+      "price": 85,
+      "size": "40 gramos",
+      "price_gram": null
+    },
+    {
+      "product_id": 8530,
+      "product_name": "Tableta chica —  Almendras 65%",
+      "message": null,
+      "price": 85,
+      "size": "40 gramos",
+      "price_gram": null
+    },
+    {
+      "product_id": 9231,
+      "product_name": "Bundle set - ¡Felicidades!",
+      "message": "",
+      "price": 550,
+      "size": "Kit",
+      "price_gram": null
+    },
+    {
+      "product_id": 9137,
+      "product_name": "Bundle de 18 fresas mixtas - ¡Felicidades!",
+      "message": "Consume el mismo día de entrega",
+      "price": 540,
+      "size": "18 fresas",
+      "price_gram": null
+    },
+    {
+      "product_id": 9068,
+      "product_name": "Bundle de 18 fresas mixtas",
+      "message": "Consume el mismo día de entrega",
+      "price": 540,
+      "size": "18 fresas",
+      "price_gram": null
+    },
+    {
+      "product_id": 8595,
+      "product_name": "Tableta chica — Frutos rojos 65%",
+      "message": "¡Más vendido!",
+      "price": 85,
+      "size": "40 gramos",
+      "price_gram": null
+    },
+    {
+      "product_id": 8531,
+      "product_name": "Tableta chica — Goji Berry 58%",
+      "message": null,
+      "price": 85,
+      "size": "40 gramos",
+      "price_gram": null
+    },
+    {
+      "product_id": 8653,
+      "product_name": "Docena de Fresas – Chocolate amargo",
+      "message": "Consume el mismo día de entrega",
+      "price": 360,
+      "size": "12 fresas",
+      "price_gram": null
+    },
+    {
+      "product_id": 9174,
+      "product_name": "Docena de Fresas – Chocolate de leche y amargo",
+      "message": "Consume el mismo día de entrega",
+      "price": 360,
+      "size": "12 fresas",
+      "price_gram": null
+    },
+    {
+      "product_id": 8654,
+      "product_name": "Docena de Fresas – Chocolate de leche",
+      "message": "Consume el mismo día de entrega",
+      "price": 360,
+      "size": "12 fresas",
+      "price_gram": null
+    },
+    {
+      "product_id": 8785,
+      "product_name": "Docena de Fresas – Chocolate blanco",
+      "message": "Consume el mismo día de entrega",
+      "price": 360,
+      "size": "12 fresas",
+      "price_gram": null
+    },
+    {
+      "product_id": 9180,
+      "product_name": "Chocolate de leche + Arroz inflado",
+      "message": "",
+      "price": 190,
+      "size": "100 gramos",
+      "price_gram": 1.9
+    },
+    {
+      "product_id": 9318,
+      "product_name": "Docena de Fresas – Chocolate amargo y blanco",
+      "message": "Consume el mismo día de entrega",
+      "price": 360,
+      "size": "12 fresas",
+      "price_gram": null
+    },
+    {
+      "product_id": 9232,
+      "product_name": "Docena de fresas - Chocolate de leche y blanco",
+      "message": "Consume el mismo día de entrega",
+      "price": 360,
+      "size": "12 fresas",
+      "price_gram": null
+    },
+    {
+      "product_id": 8533,
+      "product_name": "Tableta chica — Praliné 41%",
+      "message": "¡Más vendido!",
+      "price": 85,
+      "size": "40 gramos",
+      "price_gram": null
+    },
+    {
+      "product_id": 9187,
+      "product_name": "Caja chica con best sellers",
+      "message": "",
+      "price": 190,
+      "size": "100 gr",
+      "price_gram": null
+    },
+    {
+      "product_id": 8962,
+      "product_name": "Media docena de Fresas – Chocolate blanco",
+      "message": "Consume el mismo día de entrega",
+      "price": 180,
+      "size": "6 fresas",
+      "price_gram": null
+    },
+    {
+      "product_id": 9188,
+      "product_name": "Caja mediana con best sellers",
+      "message": "",
+      "price": 285,
+      "size": "150 gr",
+      "price_gram": null
+    },
+    {
+      "product_id": 8544,
+      "product_name": "Gelato Mangococo",
+      "message": "¡Libre de lácteos!",
+      "price": 95,
+      "size": "8 onzas",
+      "price_gram": null
+    },
+    {
+      "product_id": 8562,
+      "product_name": "Tableta chica — Velvet",
+      "message": null,
+      "price": 85,
+      "size": "40 gramos",
+      "price_gram": null
+    },
+    {
+      "product_id": 8561,
+      "product_name": "Tableta chica — Matcha",
+      "message": null,
+      "price": 85,
+      "size": "40 gramos",
+      "price_gram": null
+    },
+    {
+      "product_id": 8961,
+      "product_name": "Media docena de Fresas – Chocolate de leche",
+      "message": "Consume el mismo día de entrega",
+      "price": 180,
+      "size": "6 fresas",
+      "price_gram": null
+    },
+    {
+      "product_id": 8624,
+      "product_name": "Gelato Double Trouble",
+      "message": null,
+      "price": 95,
+      "size": "8 onzas",
+      "price_gram": null
+    },
+    {
+      "product_id": 8944,
+      "product_name": "Gelato Banana Cream",
+      "message": "¡Nuevo!",
+      "price": 95,
+      "size": "8 onzas",
+      "price_gram": null
+    },
+    {
+      "product_id": 8665,
+      "product_name": "Sorbete Chocochunks",
+      "message": "¡Libre de lácteos!",
+      "price": 95,
+      "size": "8 onzas",
+      "price_gram": null
+    },
+    {
+      "product_id": 8758,
+      "product_name": "Caja mediana con toffee",
+      "message": null,
+      "price": 285,
+      "size": "150 gramos",
+      "price_gram": null
+    },
+    {
+      "product_id": 8783,
+      "product_name": "Gelato Milky Flakes",
+      "message": null,
+      "price": 95,
+      "size": "8 onzas",
+      "price_gram": null
+    },
+    {
+      "product_id": 8721,
+      "product_name": "Gelato Berry Crunch",
+      "message": null,
+      "price": 95,
+      "size": "8 onzas",
+      "price_gram": null
+    },
+    {
+      "product_id": 8659,
+      "product_name": "Gelato Chocomisú",
+      "message": null,
+      "price": 95,
+      "size": "8 onzas",
+      "price_gram": null
+    },
+    {
+      "product_id": 8774,
+      "product_name": "Caja grande con best-sellers",
+      "message": null,
+      "price": 665,
+      "size": "350 gramos",
+      "price_gram": null
+    },
+    {
+      "product_id": 8686,
+      "product_name": "Media docena de Fresas – Chocolate amargo",
+      "message": "Consume el mismo día de entrega",
+      "price": 180,
+      "size": "6 fresas",
+      "price_gram": null
+    },
+    {
+      "product_id": 9151,
+      "product_name": "Media docena de Fresas – Chocolate de leche y amargo",
+      "message": "Consume el mismo día de entrega",
+      "price": 180,
+      "size": "6 fresas",
+      "price_gram": null
+    },
+    {
+      "product_id": 8725,
+      "product_name": "Mousse 72% + Crumble + Frutos rojos",
+      "message": null,
+      "price": 95,
+      "size": "8 onzas",
+      "price_gram": null
+    },
+    {
+      "product_id": 8724,
+      "product_name": "Mousse 72% + Toffee",
+      "message": null,
+      "price": 95,
+      "size": "8 onzas",
+      "price_gram": null
+    },
+    {
+      "product_id": 9287,
+      "product_name": "Media docena de Fresa – Chocolate amargo y blanco",
+      "message": "Consume el mismo día de entrega",
+      "price": 180,
+      "size": "6 fresas",
+      "price_gram": null
+    },
+    {
+      "product_id": 8392,
+      "product_name": "Chocolate de origen — Arauca 70%",
+      "message": "",
+      "price": 190,
+      "size": "100 gramos",
+      "price_gram": 1.9
+    },
+    {
+      "product_id": 9390,
+      "product_name": "Dubites - 2 piezas",
+      "message": "",
+      "price": 120,
+      "size": "40 gramos",
+      "price_gram": null
+    },
+    {
+      "product_id": 9391,
+      "product_name": "Dubites - 4 piezas",
+      "message": "",
+      "price": 240,
+      "size": "80 gramos",
+      "price_gram": null
+    },
+    {
+      "product_id": 9392,
+      "product_name": "Dubites - 8 piezas",
+      "message": "",
+      "price": 480,
+      "size": "160 gramos",
+      "price_gram": null
+    },
+    {
+      "product_id": 9324,
+      "product_name": "Pin Cocoan",
+      "message": "¡Nuevo!",
+      "price": 180,
+      "size": "1 pin",
+      "price_gram": null
+    },
+    {
+      "product_id": 9453,
+      "product_name": "Docena de fresas — Matcha",
+      "message": "",
+      "price": 420,
+      "size": "12 fresas",
+      "price_gram": null
+    },
+    {
+      "product_id": 9197,
+      "product_name": "Media docena de Fresas – Chocolate de leche y blanco",
+      "message": "Consume el mismo día de entrega",
+      "price": 180,
+      "size": "6 fresas",
+      "price_gram": null
+    }
+  ],
+  "categories": [
+    {
+      "category_id": 18,
+      "category_name": "Chocolate Original",
+      "priority": 14
+    },
+    {
+      "category_id": 42,
+      "category_name": "Confitería",
+      "priority": 13
+    },
+    {
+      "category_id": 23,
+      "category_name": "Fresas",
+      "priority": 12
+    },
+    {
+      "category_id": 41,
+      "category_name": "Gelatos, sorbetes y mousses",
+      "priority": 11
+    },
+    {
+      "category_id": 43,
+      "category_name": "Regalos Cocoan",
+      "priority": 10
+    },
+    {
+      "category_id": 19,
+      "category_name": "Tabletas de Chocolate",
+      "priority": 6
+    },
+    {
+      "category_id": 34,
+      "category_name": "Merch",
+      "priority": 4
+    }
+  ]
+}

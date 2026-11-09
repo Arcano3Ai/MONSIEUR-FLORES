@@ -6,13 +6,14 @@ import { store } from './state/store.js';
 // Expose store globally for inline triggers if needed
 window.store = store;
 
-document.addEventListener('DOMContentLoaded', () => {
+function initApp() {
   initHeader();
   initAtelierAudio();
   renderEmotions();
   renderProducts();
   renderBestsellers();
   renderCategories();
+  initCategoryFilters();
   initSurpriseWizard();
   initPersonalizer();
   initDeliveryChecker();
@@ -22,7 +23,14 @@ document.addEventListener('DOMContentLoaded', () => {
   initDrawersAndModals();
   initConciergeBot();
   updateHeaderBadges();
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  // En navegadores móviles o cuando los módulos cargan diferidos
+  initApp();
+}
 
 /* ==========================================================================
    HEADER & NAVIGATION SCROLL
@@ -38,21 +46,37 @@ function initHeader() {
   });
 
   const mobileToggle = document.getElementById('btn-mobile-menu');
-  if (mobileToggle) {
-    mobileToggle.addEventListener('click', () => {
-      const navList = document.querySelector('.mf-nav-list');
-      if (navList) {
-        navList.style.display = navList.style.display === 'flex' ? 'none' : 'flex';
+  const navList = document.querySelector('.mf-nav-list');
+  if (mobileToggle && navList) {
+    mobileToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = navList.classList.contains('mobile-active');
+      if (isOpen) {
+        navList.classList.remove('mobile-active');
+        navList.style.display = 'none';
+      } else {
+        navList.classList.add('mobile-active');
+        navList.style.display = 'flex';
         navList.style.flexDirection = 'column';
-        navList.style.position = 'absolute';
-        navList.style.top = '80px';
+        navList.style.position = 'fixed';
+        navList.style.top = '70px';
         navList.style.left = '0';
-        navList.style.width = '100%';
+        navList.style.width = '100vw';
+        navList.style.height = 'calc(100vh - 70px)';
         navList.style.background = 'rgba(12, 13, 12, 0.98)';
-        navList.style.padding = '24px';
-        navList.style.gap = '16px';
-        navList.style.borderBottom = '1px solid rgba(255, 255, 255, 0.1)';
+        navList.style.padding = '30px 24px';
+        navList.style.gap = '20px';
+        navList.style.zIndex = '1000';
+        navList.style.overflowY = 'auto';
       }
+    });
+
+    // Cerrar menú al hacer clic en cualquier enlace
+    navList.querySelectorAll('.mf-nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        navList.classList.remove('mobile-active');
+        navList.style.display = 'none';
+      });
     });
   }
 
@@ -247,18 +271,19 @@ function attachProductCardEvents(container) {
   });
 }
 
-// Category filter bar listeners
-const catFilterBar = document.getElementById('category-filter-bar');
-if (catFilterBar) {
-  catFilterBar.querySelectorAll('button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      catFilterBar.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const cat = btn.getAttribute('data-cat');
-      store.setCategory(cat);
-      renderProducts();
+function initCategoryFilters() {
+  const catFilterBar = document.getElementById('category-filter-bar');
+  if (catFilterBar) {
+    catFilterBar.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        catFilterBar.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const cat = btn.getAttribute('data-cat');
+        store.setCategory(cat);
+        renderProducts();
+      });
     });
-  });
+  }
 }
 
 document.addEventListener('refresh-products', () => {
@@ -626,14 +651,14 @@ function renderCartDrawer() {
     container.innerHTML = `
       <div style="text-align: center; padding: 40px 10px;">
         <div style="margin-bottom: 16px;">
-          <img src="/images/sello-lacre-mf.svg" alt="Sello de Monsieur Flores" style="width: 48px; height: 48px; opacity: 0.85; filter: grayscale(20%);">
+          <img src="./images/sello-lacre-mf.svg" alt="Sello de Monsieur Flores" style="width: 48px; height: 48px; opacity: 0.85; filter: grayscale(20%);">
         </div>
         <h4 style="margin-bottom: 6px; font-family: var(--font-serif-headline); color: var(--mf-text-main);">Tu bolsa espera una creación</h4>
         <p style="font-size: 0.85rem; color: var(--mf-text-muted); margin-bottom: 22px;">
           Descubre la selección de Monsieur y elige las flores que hablarán por ti hoy.
         </p>
         <button class="btn-monsieur" onclick="document.getElementById('cart-drawer').classList.remove('active'); document.getElementById('drawer-overlay').classList.remove('active'); document.getElementById('seleccion').scrollIntoView({behavior: 'smooth'});">
-          <img src="/images/sello-lacre-mf.svg" alt="Sello" class="btn-seal-icon">
+          <img src="./images/sello-lacre-mf.svg" alt="Sello" class="btn-seal-icon">
           <span>Ver Colección Floral</span>
         </button>
       </div>
@@ -956,7 +981,7 @@ function openCheckoutModal(step = 1) {
           <div style="display: flex; justify-content: space-between; margin-top: 10px;">
             <button class="btn-dark" id="btn-chk-back-4">← Volver</button>
             <button class="btn-monsieur" id="btn-confirm-order" style="padding: 16px 28px;">
-              <img src="/images/sello-lacre-mf.svg" alt="Sello" class="btn-seal-icon">
+              <img src="./images/sello-lacre-mf.svg" alt="Sello" class="btn-seal-icon">
               <span>Confirmar Pedido y Enviar a Atelier</span>
             </button>
           </div>
@@ -970,7 +995,7 @@ function openCheckoutModal(step = 1) {
       body.innerHTML = `
         <div style="text-align: center;">
           <div style="margin-bottom: 12px;">
-            <img src="/images/sello-lacre-mf.svg" alt="Sello Oficial Monsieur Flores" style="width: 58px; height: 58px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));">
+            <img src="./images/sello-lacre-mf.svg" alt="Sello Oficial Monsieur Flores" style="width: 58px; height: 58px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));">
           </div>
           <h3 style="font-size: 1.6rem; color: var(--mf-text-main); margin-bottom: 4px; font-family: var(--font-serif-headline);">Monsieur Flores ha recibido tu encargo</h3>
           <p style="font-size: 0.9rem; color: var(--mf-text-muted); margin-bottom: 24px;">
@@ -1057,6 +1082,14 @@ function initConciergeBot() {
     e.stopPropagation();
     toggleWindow();
   });
+
+  const mobileConcierge = document.getElementById('mobile-btn-concierge');
+  if (mobileConcierge) {
+    mobileConcierge.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleWindow();
+    });
+  }
 
   closeBtn?.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -1222,7 +1255,7 @@ const LEGAL_DOCUMENTS = {
       </div>
 
       <div class="mf-legal-signature-box">
-        <img src="/images/sello-lacre-mf.svg" alt="Sello Lacre" style="width: 38px; height: 38px;">
+        <img src="./images/sello-lacre-mf.svg" alt="Sello Lacre" style="width: 38px; height: 38px;">
         <div>
           <strong>Monsieur Flores</strong> — Maître Fleuriste<br>
           <span style="font-size: 0.8rem; opacity: 0.85;">“El arte de decirlo con flores.”</span>
@@ -1256,7 +1289,7 @@ const LEGAL_DOCUMENTS = {
       </div>
 
       <div class="mf-legal-signature-box">
-        <img src="/images/sello-lacre-mf.svg" alt="Sello Lacre" style="width: 38px; height: 38px;">
+        <img src="./images/sello-lacre-mf.svg" alt="Sello Lacre" style="width: 38px; height: 38px;">
         <div>
           <strong>Unidad de Protección y Confidencialidad</strong><br>
           <span style="font-size: 0.8rem; opacity: 0.85;">Monsieur Flores Haute Floristerie</span>
@@ -1288,7 +1321,7 @@ const LEGAL_DOCUMENTS = {
       </div>
 
       <div class="mf-legal-signature-box">
-        <img src="/images/sello-lacre-mf.svg" alt="Sello Lacre" style="width: 38px; height: 38px;">
+        <img src="./images/sello-lacre-mf.svg" alt="Sello Lacre" style="width: 38px; height: 38px;">
         <div>
           <strong>Garantía de Guante Blanco</strong><br>
           <span style="font-size: 0.8rem; opacity: 0.85;">Satisfacción total o reposición inmediata en atelier.</span>
@@ -1321,7 +1354,7 @@ const LEGAL_DOCUMENTS = {
       </div>
 
       <div class="mf-legal-signature-box">
-        <img src="/images/sello-lacre-mf.svg" alt="Sello Lacre" style="width: 38px; height: 38px;">
+        <img src="./images/sello-lacre-mf.svg" alt="Sello Lacre" style="width: 38px; height: 38px;">
         <div>
           <strong>Compromiso Botánico de Autor</strong><br>
           <span style="font-size: 0.8rem; opacity: 0.85;">Monsieur Flores · Maestro Florista</span>
@@ -1401,11 +1434,15 @@ function initAtelierAudio() {
   audioEl.setAttribute('webkit-playsinline', 'true');
   audioEl.volume = 0.35; // Nivel audible calibrado
 
-  // Asignar fuente únicamente si el elemento no tiene src definido en HTML
-  const basePrefix = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '');
+  // Asignar fuente con resolución segura universal (soporta Vite y navegador nativo)
+  const isGithubPages = window.location.pathname.includes('/MONSIEUR-FLORES');
+  const basePrefix = (typeof import.meta !== 'undefined' && import.meta && import.meta.env && import.meta.env.BASE_URL)
+    ? import.meta.env.BASE_URL.replace(/\/+$/, '')
+    : (isGithubPages ? '/MONSIEUR-FLORES' : '');
+  
   const candidateUrls = [
-    `${basePrefix}/audio/dilo-con-flores.mp3`,
     './audio/dilo-con-flores.mp3',
+    `${basePrefix}/audio/dilo-con-flores.mp3`,
     './public/audio/dilo-con-flores.mp3'
   ];
   let candidateIndex = 0;
