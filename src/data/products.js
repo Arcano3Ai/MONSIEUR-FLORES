@@ -23,7 +23,6 @@ export const PRODUCTS = [
       '24 Rosas rojas premium de exportación',
       'Follaje fino de cinerea y eucalipto aromático',
       'Empaque de lujo haute-couture con sellado artesanal',
-      'Tarjeta caligrafiada por Monsieur incluida',
       'Nutriente floral de larga vida'
     ]
   },

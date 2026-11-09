@@ -15,7 +15,7 @@ La arquitectura implementa al 100% las 17 secciones del Home, la jerarquía emoc
 ## 🏛️ Jerarquía Visual y Módulos Implementados
 
 1. **Barra Superior Dinámica (Campaign Topbar):**
-   - Franja discreta superior: *"Envío el mismo día · Arreglos florales premium de alta costura · Entrega a domicilio · Tarjeta caligrafiada por Monsieur incluida"*.
+   - Franja discreta superior: *"Envío el mismo día · Arreglos florales premium de alta costura · Entrega a domicilio"*.
 2. **Header & Mega-Navegación:**
    - Logotipo protagónico `MONSIEUR FLORES — Haute Floristerie`.
    - Menú de navegación desktop y drawer en mobile.
