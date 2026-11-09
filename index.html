@@ -60,10 +60,74 @@
   <link rel="stylesheet" href="./src/styles/variables.css">
   <link rel="stylesheet" href="./src/styles/main.css">
   <link rel="stylesheet" href="./src/styles/components.css">
+
+  <!-- Schema.org JSON-LD para Google Rich Results (Floristería de Alta Gama) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Florist",
+    "name": "Monsieur Flores Haute Floristerie",
+    "image": [
+      "https://arcano3ai.github.io/MONSIEUR-FLORES/images/og-monsieur-flores.jpg",
+      "https://arcano3ai.github.io/MONSIEUR-FLORES/images/og-square.jpg"
+    ],
+    "@id": "https://arcano3ai.github.io/MONSIEUR-FLORES/#florist",
+    "url": "https://arcano3ai.github.io/MONSIEUR-FLORES/",
+    "telephone": "+528112345678",
+    "priceRange": "$$$$",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Calzada del Valle 400",
+      "addressLocality": "San Pedro Garza García",
+      "addressRegion": "Nuevo León",
+      "postalCode": "66220",
+      "addressCountry": "MX"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 25.6575,
+      "longitude": -100.3667
+    },
+    "openingHoursSpecification": {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": [
+        "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
+      ],
+      "opens": "07:00",
+      "closes": "21:00"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.96",
+      "reviewCount": "840",
+      "bestRating": "5"
+    },
+    "hasOfferCatalog": {
+      "@type": "OfferCatalog",
+      "name": "Colección Floral de Autor y Chocolatería Artesanal",
+      "itemListElement": [
+        {
+          "@type": "OfferCatalog",
+          "name": "Rosas de Autor",
+          "itemListElement": [
+            { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "La Clásica Inolvidable" } }
+          ]
+        },
+        {
+          "@type": "OfferCatalog",
+          "name": "Chocolatería Fina",
+          "itemListElement": [
+            { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Chocolatería Artesanal COCOAN" } }
+          ]
+        }
+      ]
+    }
+  }
+  </script>
 </head>
 <body>
 
-  <!-- 1. BARRA SUPERIOR (Campaña cambiable) -->
+  <!-- 1. BARRA SUPERIOR (Campaña cambiable + Selector de Moneda) -->
   <aside class="mf-topbar" id="topbar">
     <div class="mf-topbar-content">
       <span class="mf-topbar-item">Envío el mismo día</span>
@@ -71,6 +135,14 @@
       <span class="mf-topbar-item">Arreglos florales premium de alta costura</span>
       <span class="mf-topbar-dot">✦</span>
       <span class="mf-topbar-item">Entrega garantizada a domicilio</span>
+    </div>
+    <div class="mf-topbar-currency" id="currency-switcher">
+      <span style="font-size: 0.68rem; color: var(--mf-gold-light); margin-right: 4px;">Moneda:</span>
+      <button class="mf-curr-btn active" data-curr="MXN">MXN</button>
+      <span style="opacity: 0.4;">|</span>
+      <button class="mf-curr-btn" data-curr="USD">USD</button>
+      <span style="opacity: 0.4;">|</span>
+      <button class="mf-curr-btn" data-curr="EUR">EUR</button>
     </div>
   </aside>
 
@@ -734,9 +806,9 @@
           <ul class="mf-footer-links">
             <li><a href="#entrega">Preguntas Frecuentes</a></li>
             <li><a href="#entrega">Zonas de Entrega</a></li>
-            <li><a href="#modal-checkout">Seguimiento de Pedido</a></li>
+            <li><a href="#" onclick="event.preventDefault(); window.openTrackingModal();">Seguimiento de Pedido</a></li>
             <li><a href="#" onclick="event.preventDefault(); window.openLegalModal('frescura');">Cuidados de tus Flores</a></li>
-            <li><a href="#" onclick="event.preventDefault(); alert('Para emitir tu factura fiscal (CFDI 4.0), envía tu número de orden y Constancia de Situación Fiscal a facturacion@monsieurflores.mx');">Facturación Electrónica</a></li>
+            <li><a href="#" onclick="event.preventDefault(); window.openInvoiceModal();">Facturación Electrónica</a></li>
           </ul>
         </div>
 
@@ -757,8 +829,8 @@
           <p style="font-size: 0.85rem; line-height: 1.5;">
             Recibe inspiración botánica, códigos de cortesía y reflexiones exclusivas de Monsieur Flores.
           </p>
-          <form class="mf-newsletter-form" id="newsletter-form" onsubmit="event.preventDefault(); alert('¡Merci! Monsieur ha recibido tu correo con agrado.');">
-            <input type="email" required placeholder="Tu correo electrónico" class="mf-newsletter-input">
+          <form class="mf-newsletter-form" id="newsletter-form" onsubmit="event.preventDefault(); window.handleNewsletterSubmit(this);">
+            <input type="email" required placeholder="Tu correo electrónico" class="mf-newsletter-input" id="newsletter-email-input">
             <button type="submit" class="mf-newsletter-btn">SUSCRIBIRME</button>
           </form>
         </div>
@@ -871,12 +943,33 @@
       <!-- Items dynamically populated -->
     </div>
     <div class="mf-drawer-footer">
+      <!-- Módulo de Cupón de Atelier -->
+      <div class="mf-cart-coupon-box" style="margin-bottom: 16px; padding: 12px; background: rgba(255,255,255,0.04); border: 1px dashed rgba(197,160,89,0.35); border-radius: 4px;">
+        <label style="display: block; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mf-gold-light); margin-bottom: 6px; font-weight: 600;">
+          Código de Cortesía o Invitación
+        </label>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="cart-coupon-input" placeholder="ej. MONSIEUR10" style="flex-grow: 1; background: #111311; color: #ffffff; border: 1px solid rgba(197,160,89,0.4); padding: 8px 12px; font-size: 0.8rem; text-transform: uppercase; border-radius: 2px;">
+          <button class="btn-dark" id="btn-apply-coupon" style="padding: 8px 14px; font-size: 0.74rem;">Aplicar</button>
+        </div>
+        <div id="cart-coupon-feedback" style="display: none; margin-top: 6px; font-size: 0.74rem;"></div>
+      </div>
+
       <div class="mf-cart-total-row">
-        <span>Subtotal Estimado:</span>
+        <span>Subtotal:</span>
         <span id="cart-subtotal-val">$0 MXN</span>
       </div>
-      <p style="font-size: 0.78rem; color: var(--mf-text-muted); margin-bottom: 14px;">
-        * Envío calculado según código postal en el checkout. Tarjeta de algodón y sello en cera incluidos.
+      <div class="mf-cart-total-row" id="cart-discount-row" style="display: none; color: #4ade80; font-size: 0.95rem;">
+        <span>Cortesía Especial:</span>
+        <span id="cart-discount-val">-$0 MXN</span>
+      </div>
+      <div class="mf-cart-total-row" id="cart-final-total-row" style="font-size: 1.35rem; color: var(--mf-gold-light); border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px; margin-top: 4px;">
+        <span>Total a Pagar:</span>
+        <span id="cart-total-val">$0 MXN</span>
+      </div>
+
+      <p style="font-size: 0.76rem; color: var(--mf-text-muted); margin-bottom: 14px;">
+        * Envío climatizado bonificado según código postal. Incluye tarjeta de algodón con caligrafía y sello de lacre.
       </p>
       <button class="btn-primary" id="btn-start-checkout" style="width: 100%;">
         Continuar al Pago Seguro →
@@ -960,6 +1053,151 @@
       </div>
     </div>
   </div>
+
+  <!-- MODAL: BÚSQUEDA DE ALTA COSTURA (OMNIBOX SPOTLIGHT) -->
+  <div class="mf-modal-wrap" id="search-modal">
+    <div class="mf-modal-box mf-search-modal-box">
+      <div class="mf-search-header">
+        <div class="mf-search-input-wrap">
+          <svg class="mf-search-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="omni-search-input" class="mf-search-input" placeholder="¿Qué flor o sentimiento buscas hoy? (ej. Rosas Rojas, COCOAN, Aniversario)..." autocomplete="off">
+          <button class="mf-search-clear" id="btn-search-clear" style="display: none;">✕</button>
+        </div>
+        <button class="mf-drawer-close" id="btn-close-search">✕</button>
+      </div>
+
+      <!-- Sugerencias Rápidas / Chips -->
+      <div class="mf-search-suggestions">
+        <span class="mf-search-sugg-label">Sugerencias del Atelier:</span>
+        <button class="mf-search-chip" data-term="Rosas">Rosas de Autor</button>
+        <button class="mf-search-chip" data-term="COCOAN">Chocolates COCOAN</button>
+        <button class="mf-search-chip" data-term="Tulipanes">Tulipanes Franceses</button>
+        <button class="mf-search-chip" data-term="Amor">Romance & Pasión</button>
+        <button class="mf-search-chip" data-term="Perdón">Pedir Perdón</button>
+        <button class="mf-search-chip" data-term="Orquídeas">Orquídeas Exóticas</button>
+      </div>
+
+      <!-- Resultados en Tiempo Real -->
+      <div class="mf-search-results" id="search-results-list">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: SEGUIMIENTO DE PEDIDO EN TIEMPO REAL -->
+  <div class="mf-modal-wrap" id="tracking-modal">
+    <div class="mf-modal-box mf-tracking-modal-box">
+      <div class="mf-modal-header">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <img src="./images/sello-lacre-mf.svg" alt="Sello Monsieur Flores" style="width: 36px; height: 36px;">
+          <div>
+            <span class="mf-eyebrow" style="margin-bottom: 2px;">Conserjería & Logística</span>
+            <h3 style="font-size: 1.35rem;">Rastreo de Encargo de Autor</h3>
+          </div>
+        </div>
+        <button class="mf-drawer-close" id="btn-close-tracking" onclick="window.closeTrackingModal();">✕</button>
+      </div>
+
+      <div class="mf-modal-body" style="padding: 24px 28px;">
+        <!-- Input de Folio -->
+        <div style="margin-bottom: 24px;">
+          <label style="display: block; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mf-gold-primary); margin-bottom: 8px; font-weight: 600;">
+            Ingresa tu Folio de Pedido
+          </label>
+          <div style="display: flex; gap: 10px;">
+            <input type="text" id="tracking-input-folio" placeholder="ej. MF-849201" style="flex-grow: 1; background: #141614; color: #ffffff; border: 1px solid rgba(197,160,89,0.45); padding: 12px 16px; font-size: 0.95rem; text-transform: uppercase; border-radius: 2px;">
+            <button class="btn-primary" id="btn-submit-tracking" style="padding: 12px 22px;">Consultar</button>
+          </div>
+          <div style="display: flex; gap: 8px; margin-top: 10px; align-items: center;">
+            <span style="font-size: 0.72rem; color: var(--mf-text-muted);">Probar con folio de muestra:</span>
+            <button class="mf-quick-folio-btn" id="btn-demo-folio">MF-ACTIVO</button>
+          </div>
+        </div>
+
+        <!-- Contenedor del Estado de la Orden -->
+        <div id="tracking-result-box">
+          <!-- Injected dynamically -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: FACTURACIÓN ELECTRÓNICA CFDI 4.0 -->
+  <div class="mf-modal-wrap" id="invoice-modal">
+    <div class="mf-modal-box mf-invoice-modal-box">
+      <div class="mf-modal-header">
+        <div>
+          <span class="mf-eyebrow" style="margin-bottom: 2px;">Departamento Fiscal</span>
+          <h3 style="font-size: 1.35rem;">Solicitud de Factura (CFDI 4.0)</h3>
+        </div>
+        <button class="mf-drawer-close" id="btn-close-invoice" onclick="window.closeInvoiceModal();">✕</button>
+      </div>
+
+      <div class="mf-modal-body" style="padding: 24px 28px;">
+        <p style="font-size: 0.85rem; color: var(--mf-text-muted); margin-bottom: 20px; line-height: 1.5;">
+          Emitimos comprobantes fiscales digitales válidos ante el SAT para personas físicas y morales. Tu factura será timbrada y enviada en formato PDF y XML en un plazo máximo de 24 horas.
+        </p>
+
+        <form id="invoice-form" onsubmit="event.preventDefault(); window.handleInvoiceSubmit(this);">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+            <div>
+              <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px;">Folio de Pedido:</label>
+              <input type="text" id="inv-order-id" required placeholder="ej. MF-782910" class="mf-input-field" style="color: black; background: #f8f9f8; border: 1px solid #ccc; width: 100%;">
+            </div>
+            <div>
+              <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px;">RFC con Homoclave:</label>
+              <input type="text" required placeholder="ej. MFL240101XYZ" class="mf-input-field" style="color: black; background: #f8f9f8; border: 1px solid #ccc; width: 100%; text-transform: uppercase;">
+            </div>
+          </div>
+
+          <div style="margin-bottom: 14px;">
+            <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px;">Razón Social o Nombre Fiscal Completo (Sin régimen de capital):</label>
+            <input type="text" required placeholder="ej. FLORES Y ATELIERS DE MEXICO" class="mf-input-field" style="color: black; background: #f8f9f8; border: 1px solid #ccc; width: 100%;">
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+            <div>
+              <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px;">Régimen Fiscal:</label>
+              <select required class="mf-input-field" style="color: black; background: #f8f9f8; border: 1px solid #ccc; width: 100%;">
+                <option value="601">601 - General de Ley Personas Morales</option>
+                <option value="605">605 - Sueldos y Salarios e Ingresos Asimilados</option>
+                <option value="612">612 - Personas Físicas con Actividades Empresariales</option>
+                <option value="626" selected>626 - Régimen Simplificado de Confianza (RESICO)</option>
+                <option value="616">616 - Sin obligaciones fiscales</option>
+              </select>
+            </div>
+            <div>
+              <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px;">Código Postal Fiscal:</label>
+              <input type="text" required maxlength="5" placeholder="ej. 66220" class="mf-input-field" style="color: black; background: #f8f9f8; border: 1px solid #ccc; width: 100%;">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px;">
+            <div>
+              <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px;">Uso de CFDI:</label>
+              <select required class="mf-input-field" style="color: black; background: #f8f9f8; border: 1px solid #ccc; width: 100%;">
+                <option value="G03" selected>G03 - Gastos en general</option>
+                <option value="G01">G01 - Adquisición de mercancías</option>
+                <option value="S01">S01 - Sin efectos fiscales</option>
+              </select>
+            </div>
+            <div>
+              <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px;">Correo para PDF y XML:</label>
+              <input type="email" required placeholder="facturas@tuempresa.com" class="mf-input-field" style="color: black; background: #f8f9f8; border: 1px solid #ccc; width: 100%;">
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 12px;">
+            <button type="button" class="btn-dark" onclick="window.closeInvoiceModal();">Cancelar</button>
+            <button type="submit" class="btn-primary">Enviar Solicitud Fiscal →</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENEDOR GLOBAL DE TOASTS DE TERCIOPELO (REEMPLAZA A ALERT NATIVO) -->
+  <div class="mf-toast-container" id="mf-toast-container" aria-live="polite"></div>
 
   <!-- REPRODUCTOR AMBIENTAL DE ALTA COSTURA: "DILO CON FLORES" -->
   <audio id="mf-atelier-audio" loop preload="auto" playsinline="true" webkit-playsinline="true" src="./audio/dilo-con-flores.mp3">

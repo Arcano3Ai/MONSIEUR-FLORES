@@ -21,8 +21,13 @@ function initApp() {
   renderInstagram();
   renderJournal();
   initDrawersAndModals();
+  initSearchModal();
+  initTrackingModal();
+  initInvoiceModal();
+  initCurrencySwitcher();
   initConciergeBot();
   updateHeaderBadges();
+  initServiceWorker();
 }
 
 if (document.readyState === 'loading') {
@@ -611,29 +616,66 @@ function initDrawersAndModals() {
   // Product Detail Modal triggers
   document.getElementById('btn-close-prod-modal')?.addEventListener('click', closeAll);
 
-  // Search button
+  // Search button triggers (Apertura de Omnibox de Lujo)
   const searchBtn = document.getElementById('btn-search-open');
   const mobileSearch = document.getElementById('mobile-btn-search');
-  const handleSearch = () => {
-    const term = prompt('¿Qué flor o arreglo buscas? (ej. Rosas, Peonías, Disculpa, etc.)');
-    if (term) {
-      store.setSearchQuery(term);
-      renderProducts();
-      document.getElementById('seleccion')?.scrollIntoView({ behavior: 'smooth' });
+  searchBtn?.addEventListener('click', () => openSearchModal());
+  mobileSearch?.addEventListener('click', () => openSearchModal());
+
+  // Atajo de teclado universal para búsqueda: Cmd+K / Ctrl+K o /
+  window.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      openSearchModal();
+    } else if (e.key === 'Escape') {
+      closeAll();
+      closeSearchModal();
+      window.closeTrackingModal?.();
+      window.closeInvoiceModal?.();
+      window.closeLegalModal?.();
     }
-  };
-  searchBtn?.addEventListener('click', handleSearch);
-  mobileSearch?.addEventListener('click', handleSearch);
+  });
 
   // Meet Monsieur Modal
   document.getElementById('btn-meet-monsieur-modal')?.addEventListener('click', () => {
-    alert('“Monsieur Flores es la voz de tus afectos más puros. Un atelier fundado para convertir cada ramo en una pieza inolvidable de la alta floristería mexicana con espíritu europeo.”');
+    showVelvetToast(
+      'Manifiesto de Monsieur Flores',
+      '“Monsieur Flores es la voz de tus afectos más puros. Un atelier fundado para convertir cada ramo en una pieza inolvidable de la alta floristería mexicana con espíritu europeo.”'
+    );
+  });
+
+  // Aplicar Cupón en Carrito
+  const btnApplyCoupon = document.getElementById('btn-apply-coupon');
+  const couponInput = document.getElementById('cart-coupon-input');
+  const applyCouponHandler = () => {
+    if (!couponInput) return;
+    const res = store.applyCoupon(couponInput.value);
+    if (res.success) {
+      showVelvetToast('Cortesía de Atelier', res.message);
+      couponInput.value = '';
+    } else {
+      showVelvetToast('Código de Cortesía', res.message, true);
+    }
+  };
+  btnApplyCoupon?.addEventListener('click', applyCouponHandler);
+  couponInput?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      applyCouponHandler();
+    }
   });
 
   // React to store notifications
   store.subscribe('cart:updated', () => {
     updateHeaderBadges();
     renderCartDrawer();
+  });
+
+  store.subscribe('currency:updated', () => {
+    renderProducts();
+    renderBestsellers();
+    renderCartDrawer();
+    renderFavoritesDrawer();
   });
 
   store.subscribe('favorites:updated', () => {
@@ -688,7 +730,31 @@ function renderCartDrawer() {
     `;
   }).join('');
 
-  subtotalEl.textContent = `$${store.getCartSubtotal().toLocaleString('es-MX')} MXN`;
+  subtotalEl.textContent = store.formatPrice(store.getCartSubtotal());
+
+  // Manejo visual de descuento y total
+  const discountRow = document.getElementById('cart-discount-row');
+  const discountVal = document.getElementById('cart-discount-val');
+  const totalVal = document.getElementById('cart-total-val');
+  const feedbackBox = document.getElementById('cart-coupon-feedback');
+
+  if (store.coupon) {
+    const discountAmt = store.getDiscountAmount();
+    if (discountRow) discountRow.style.display = 'flex';
+    if (discountVal) discountVal.textContent = `-${store.formatPrice(discountAmt)}`;
+    if (totalVal) totalVal.textContent = store.formatPrice(store.getCartTotal());
+    if (feedbackBox) {
+      feedbackBox.style.display = 'block';
+      feedbackBox.innerHTML = `
+        <span style="color: #4ade80;">✓ ${store.coupon.label}</span>
+        <button onclick="window.store.removeCoupon();" style="background: none; border: none; color: #f87171; text-decoration: underline; margin-left: 8px; cursor: pointer; font-size: 0.72rem;">Remover</button>
+      `;
+    }
+  } else {
+    if (discountRow) discountRow.style.display = 'none';
+    if (totalVal) totalVal.textContent = store.formatPrice(store.getCartSubtotal());
+    if (feedbackBox) feedbackBox.style.display = 'none';
+  }
 }
 
 function renderFavoritesDrawer() {
@@ -990,8 +1056,15 @@ function openCheckoutModal(step = 1) {
       document.getElementById('btn-chk-back-4')?.addEventListener('click', () => renderStep(4));
       document.getElementById('btn-confirm-order')?.addEventListener('click', () => renderStep(6));
     } else if (curStep === 6) {
-      // ORDER TRACKING SCREEN
+      // ORDER TRACKING SCREEN & WHATSAPP DISPATCH
       title.textContent = '¡Merci! Pedido Confirmado';
+      const orderId = store.orderTracking.orderId;
+      const finalTotalFormatted = store.formatPrice(store.getCartTotal());
+      const itemsList = store.cart.map(i => `• ${i.product.name} (${i.size.name}) x${i.quantity}`).join('\n');
+      
+      const whatsappMsg = `Bonjour Monsieur Flores! Acabo de confirmar mi encargo de autor con Folio: *${orderId}*.\n\n*Creaciones:* \n${itemsList}\n\n*Total:* ${finalTotalFormatted}\n*Destinatario:* Sofía Navarro\n*Dedicatoria:* "Para la persona que ilumina cada uno de mis días. Con todo mi amor."\n\nPor favor confirmen la recepción y la preparación en el atelier. ¡Merci!`;
+      const waUrl = `https://api.whatsapp.com/send?phone=528112345678&text=${encodeURIComponent(whatsappMsg)}`;
+
       body.innerHTML = `
         <div style="text-align: center;">
           <div style="margin-bottom: 12px;">
@@ -999,7 +1072,7 @@ function openCheckoutModal(step = 1) {
           </div>
           <h3 style="font-size: 1.6rem; color: var(--mf-text-main); margin-bottom: 4px; font-family: var(--font-serif-headline);">Monsieur Flores ha recibido tu encargo</h3>
           <p style="font-size: 0.9rem; color: var(--mf-text-muted); margin-bottom: 24px;">
-            Folio de Pedido de Autor: <strong>${store.orderTracking.orderId}</strong>
+            Folio de Pedido de Autor: <strong style="color: var(--mf-gold-primary); font-family: monospace; font-size: 1.1rem;">${orderId}</strong>
           </p>
 
           <div class="mf-tracking-flow">
@@ -1014,16 +1087,16 @@ function openCheckoutModal(step = 1) {
             <div class="mf-tracking-node active">
               <div class="mf-tracking-icon" style="font-family: var(--font-serif-display); font-weight: 700;">II</div>
               <div style="text-align: left;">
-                <strong style="font-size: 0.95rem; color: var(--mf-gold-primary);">Monsieur está preparando tu arreglo</strong>
-                <p style="font-size: 0.78rem; color: var(--mf-text-muted);">Selección de flores en su apertura ideal y caligrafía de carta</p>
+                <strong style="font-size: 0.95rem; color: var(--mf-gold-primary);">Monsieur está confeccionando tu arreglo</strong>
+                <p style="font-size: 0.78rem; color: var(--mf-text-muted);">Corte en 45°, hidratación francesa y caligrafía de la carta</p>
               </div>
             </div>
 
             <div class="mf-tracking-node">
               <div class="mf-tracking-icon" style="font-family: var(--font-serif-display); font-weight: 700;">III</div>
               <div style="text-align: left;">
-                <strong style="font-size: 0.95rem;">En camino con nuestro conserje</strong>
-                <p style="font-size: 0.78rem; color: var(--mf-text-muted);">Vehículo climatizado rumbo a la zona metropolitana</p>
+                <strong style="font-size: 0.95rem;">En camino con conserje privado</strong>
+                <p style="font-size: 0.78rem; color: var(--mf-text-muted);">Vehículo climatizado a 14°C rumbo a destino</p>
               </div>
             </div>
 
@@ -1036,15 +1109,27 @@ function openCheckoutModal(step = 1) {
             </div>
           </div>
 
-          <div style="background: var(--mf-bg-light); padding: 18px; border-radius: var(--radius-md); margin-bottom: 24px; font-size: 0.85rem; text-align: left;">
-            <p><strong>Destinatario:</strong> Sofía Navarro</p>
-            <p><strong>Horario Estimado:</strong> Hoy, 2:00 PM – 4:00 PM</p>
-            <p><strong>Actualizaciones en vivo:</strong> Enviadas al WhatsApp +52 81 1234 5678</p>
+          <div style="background: var(--mf-bg-light); padding: 18px; border-radius: var(--radius-md); margin-bottom: 20px; font-size: 0.85rem; text-align: left;">
+            <p style="margin-bottom: 4px;"><strong>Destinatario:</strong> Sofía Navarro</p>
+            <p style="margin-bottom: 4px;"><strong>Horario Estimado:</strong> Hoy, 2:00 PM – 4:00 PM</p>
+            <p style="margin-bottom: 4px;"><strong>Importe Liquidado:</strong> ${finalTotalFormatted}</p>
+            <p style="margin-bottom: 0;"><strong>Actualizaciones en vivo:</strong> Vía WhatsApp al +52 81 1234 5678</p>
           </div>
 
-          <button class="btn-primary" onclick="document.getElementById('checkout-modal').classList.remove('active'); document.getElementById('drawer-overlay').classList.remove('active'); document.body.classList.remove('mf-modal-open');">
-            Volver a la Boutique
-          </button>
+          <!-- Acciones Clave de Despacho y Comprobante -->
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="btn-primary" style="width: 100%; text-decoration: none; padding: 14px 20px;">
+              <span>Enviar Confirmación y Dedicatoria a Monsieur por WhatsApp →</span>
+            </a>
+            <div style="display: flex; gap: 10px;">
+              <button class="btn-secondary" onclick="window.print();" style="flex: 1; padding: 12px 14px; font-size: 0.75rem;">
+                Imprimir Comprobante Oficial
+              </button>
+              <button class="btn-dark" onclick="document.getElementById('checkout-modal').classList.remove('active'); document.getElementById('drawer-overlay').classList.remove('active'); document.body.classList.remove('mf-modal-open');" style="flex: 1; padding: 12px 14px; font-size: 0.75rem;">
+                Volver a la Boutique
+              </button>
+            </div>
+          </div>
         </div>
       `;
     }
@@ -1601,4 +1686,342 @@ function initAtelierAudio() {
   audioEl.addEventListener('play', () => updateUI(true));
   audioEl.addEventListener('pause', () => updateUI(false));
   audioEl.addEventListener('ended', () => updateUI(false));
+}
+
+/* ==========================================================================
+   SISTEMA DE TOASTS DE TERCIOPELO (REEMPLAZA A ALERT NATIVO)
+   ========================================================================== */
+export function showVelvetToast(title, message, isError = false) {
+  const container = document.getElementById('mf-toast-container');
+  if (!container) return;
+
+  const toast = document.createElement('div');
+  toast.className = `mf-velvet-toast ${isError ? 'toast-error' : ''}`;
+  toast.innerHTML = `
+    <img src="./images/sello-lacre-mf.svg" alt="Sello Monsieur" class="mf-velvet-toast-seal">
+    <div class="mf-velvet-toast-content">
+      <strong>${title}</strong>
+      <span>${message}</span>
+    </div>
+  `;
+
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(15px)';
+    setTimeout(() => toast.remove(), 400);
+  }, 4500);
+}
+
+/* ==========================================================================
+   MODAL DE BÚSQUEDA SPOTLIGHT / OMNIBOX DE ALTA COSTURA
+   ========================================================================== */
+export function openSearchModal() {
+  const modal = document.getElementById('search-modal');
+  const overlay = document.getElementById('drawer-overlay');
+  const input = document.getElementById('omni-search-input');
+  if (!modal || !overlay) return;
+
+  overlay.classList.add('active');
+  modal.classList.add('active');
+  document.body.classList.add('mf-modal-open');
+
+  if (input) {
+    setTimeout(() => input.focus(), 120);
+    renderSearchResults(input.value);
+  }
+}
+
+export function closeSearchModal() {
+  const modal = document.getElementById('search-modal');
+  const overlay = document.getElementById('drawer-overlay');
+  modal?.classList.remove('active');
+  overlay?.classList.remove('active');
+  document.body.classList.remove('mf-modal-open');
+}
+
+function renderSearchResults(query = '') {
+  const container = document.getElementById('search-results-list');
+  const clearBtn = document.getElementById('btn-search-clear');
+  if (!container) return;
+
+  const q = (query || '').toLowerCase().trim();
+  if (clearBtn) {
+    clearBtn.style.display = q ? 'block' : 'none';
+  }
+
+  const matches = q
+    ? PRODUCTS.filter(p =>
+        p.name.toLowerCase().includes(q) ||
+        p.description.toLowerCase().includes(q) ||
+        p.category.toLowerCase().includes(q) ||
+        p.tagline.toLowerCase().includes(q) ||
+        p.emotions.some(e => e.includes(q))
+      )
+    : PRODUCTS.slice(0, 5); // Mostrar destacados cuando el input está vacío
+
+  if (matches.length === 0) {
+    container.innerHTML = `
+      <div style="text-align: center; padding: 40px 10px; color: var(--mf-text-muted);">
+        <p style="font-family: var(--font-serif-headline); font-size: 1.15rem; color: #ffffff; margin-bottom: 6px;">
+          No hallamos creaciones bajo el término “${query}”
+        </p>
+        <p style="font-size: 0.85rem;">Prueba buscando "Rosas", "COCOAN", "Tulipanes" o pregúntale a Monsieur en el Concierge.</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = matches.map(prod => `
+    <div class="mf-search-item" data-id="${prod.id}">
+      <img src="${prod.image}" alt="${prod.name}" class="mf-search-item-img" loading="lazy">
+      <div class="mf-search-item-info">
+        <h4 class="mf-search-item-title">${prod.name}</h4>
+        <span class="mf-search-item-tag">${prod.category} · ${prod.tagline}</span>
+      </div>
+      <div class="mf-search-item-price">${store.formatPrice(prod.price)}</div>
+      <button class="btn-dark" style="padding: 6px 14px; font-size: 0.72rem;" onclick="event.stopPropagation(); window.store.addToCart(window.store.getFilteredProducts().find(p => p.id === '${prod.id}') || ${JSON.stringify(prod)}); window.closeSearchModal();">
+        Adquirir
+      </button>
+    </div>
+  `).join('');
+
+  container.querySelectorAll('.mf-search-item').forEach(el => {
+    el.addEventListener('click', () => {
+      const id = el.getAttribute('data-id');
+      const prod = PRODUCTS.find(p => p.id === id);
+      if (prod) {
+        closeSearchModal();
+        openProductModal(prod);
+      }
+    });
+  });
+}
+
+function initSearchModal() {
+  const input = document.getElementById('omni-search-input');
+  const clearBtn = document.getElementById('btn-search-clear');
+  const closeBtn = document.getElementById('btn-close-search');
+
+  input?.addEventListener('input', (e) => {
+    renderSearchResults(e.target.value);
+  });
+
+  clearBtn?.addEventListener('click', () => {
+    if (input) {
+      input.value = '';
+      input.focus();
+      renderSearchResults('');
+    }
+  });
+
+  closeBtn?.addEventListener('click', closeSearchModal);
+
+  document.querySelectorAll('.mf-search-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const term = chip.getAttribute('data-term') || '';
+      if (input) {
+        input.value = term;
+        renderSearchResults(term);
+      }
+    });
+  });
+}
+
+/* ==========================================================================
+   MODAL DE SEGUIMIENTO DE PEDIDO (TRACKING REAL)
+   ========================================================================== */
+window.openTrackingModal = function(initialFolio = '') {
+  const modal = document.getElementById('tracking-modal');
+  const overlay = document.getElementById('drawer-overlay');
+  const input = document.getElementById('tracking-input-folio');
+  if (!modal || !overlay) return;
+
+  overlay.classList.add('active');
+  modal.classList.add('active');
+  document.body.classList.add('mf-modal-open');
+
+  const folioToUse = initialFolio || store.orderTracking.orderId;
+  if (input) {
+    input.value = folioToUse;
+  }
+  renderTrackingResult(folioToUse);
+};
+
+window.closeTrackingModal = function() {
+  const modal = document.getElementById('tracking-modal');
+  const overlay = document.getElementById('drawer-overlay');
+  modal?.classList.remove('active');
+  overlay?.classList.remove('active');
+  document.body.classList.remove('mf-modal-open');
+};
+
+function renderTrackingResult(folio) {
+  const box = document.getElementById('tracking-result-box');
+  if (!box) return;
+
+  const info = store.getTrackingInfo(folio);
+  if (!info.found) {
+    box.innerHTML = `
+      <div style="text-align: center; padding: 24px 10px; background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.3); border-radius: 4px;">
+        <p style="color: #f87171; font-weight: 600; margin-bottom: 4px;">No encontramos un encargo con el folio: ${folio}</p>
+        <p style="font-size: 0.8rem; color: var(--mf-text-muted);">Verifica que el código coincida con el correo de confirmación o consulta a nuestro conserje.</p>
+      </div>
+    `;
+    return;
+  }
+
+  const ord = info.order;
+  const isDemo = folio.toUpperCase().includes('DEMO') || folio.toUpperCase() === 'MF-ACTIVO';
+
+  box.innerHTML = `
+    <div class="mf-tracking-status-banner">
+      <img src="./images/sello-lacre-mf.svg" alt="Sello" style="width: 44px; height: 44px;">
+      <div>
+        <div style="font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--mf-gold-primary); font-weight: 600;">Estado en Vivo</div>
+        <h4 style="font-size: 1.15rem; color: #ffffff; margin: 2px 0;">Monsieur Confeccionando en Atelier</h4>
+        <span style="font-size: 0.8rem; color: #a3e635;">● Conserje y vehículo refrigerado asignados (14°C)</span>
+      </div>
+    </div>
+
+    <div class="mf-tracking-step-line">
+      <div class="mf-tracking-point done">
+        <strong style="color: #ffffff; font-size: 0.92rem;">I. Pedido Recibido y Pago Acreditado</strong>
+        <p style="font-size: 0.78rem; color: var(--mf-text-muted); margin-top: 2px;">Validación bancaria cifrada completada.</p>
+      </div>
+      <div class="mf-tracking-point active">
+        <strong style="color: var(--mf-gold-primary); font-size: 0.92rem;">II. Confección Floral y Caligrafía de Carta</strong>
+        <p style="font-size: 0.78rem; color: #f0ede6; margin-top: 2px;">Corte de tallos en 45°, nutrientes franceses y dedicatoria con sello de cera.</p>
+      </div>
+      <div class="mf-tracking-point">
+        <strong style="color: rgba(255,255,255,0.7); font-size: 0.92rem;">III. En Camino en Unidad Climatizada</strong>
+        <p style="font-size: 0.78rem; color: var(--mf-text-muted); margin-top: 2px;">Chofer con protocolo de guante blanco rumbo al domicilio.</p>
+      </div>
+      <div class="mf-tracking-point">
+        <strong style="color: rgba(255,255,255,0.7); font-size: 0.92rem;">IV. Entrega Protocolaria en Mano</strong>
+        <p style="font-size: 0.78rem; color: var(--mf-text-muted); margin-top: 2px;">Fotografía y firma de recepción enviada al remitente.</p>
+      </div>
+    </div>
+
+    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 14px 18px; border-radius: 4px; font-size: 0.84rem; margin-bottom: 18px;">
+      <p style="margin-bottom: 4px;"><strong>Destinatario:</strong> ${ord.recipientName || 'Sofía Navarro'}</p>
+      <p style="margin-bottom: 4px;"><strong>Destino:</strong> ${ord.address}</p>
+      <p style="margin-bottom: 0;"><strong>Ventana de Entrega Estimada:</strong> ${ord.deliverySlot}</p>
+    </div>
+
+    <a href="https://api.whatsapp.com/send?phone=528112345678&text=Bonjour!%20Deseo%20consultar%20el%20estatus%20del%20folio%20${ord.orderId}" target="_blank" rel="noopener noreferrer" class="btn-secondary" style="width: 100%; text-decoration: none; padding: 12px; font-size: 0.78rem;">
+      <span>Hablar con el Conserje a Cargo por WhatsApp →</span>
+    </a>
+  `;
+}
+
+function initTrackingModal() {
+  const submitBtn = document.getElementById('btn-submit-tracking');
+  const input = document.getElementById('tracking-input-folio');
+  const demoBtn = document.getElementById('btn-demo-folio');
+
+  submitBtn?.addEventListener('click', () => {
+    if (input && input.value.trim()) {
+      renderTrackingResult(input.value.trim());
+    }
+  });
+
+  input?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (input.value.trim()) renderTrackingResult(input.value.trim());
+    }
+  });
+
+  demoBtn?.addEventListener('click', () => {
+    if (input) {
+      input.value = store.orderTracking.orderId;
+      renderTrackingResult(store.orderTracking.orderId);
+    }
+  });
+}
+
+/* ==========================================================================
+   MODAL DE FACTURACIÓN ELECTRÓNICA CFDI 4.0
+   ========================================================================== */
+window.openInvoiceModal = function() {
+  const modal = document.getElementById('invoice-modal');
+  const overlay = document.getElementById('drawer-overlay');
+  const orderInput = document.getElementById('inv-order-id');
+  if (!modal || !overlay) return;
+
+  if (orderInput && !orderInput.value) {
+    orderInput.value = store.orderTracking.orderId;
+  }
+
+  overlay.classList.add('active');
+  modal.classList.add('active');
+  document.body.classList.add('mf-modal-open');
+};
+
+window.closeInvoiceModal = function() {
+  const modal = document.getElementById('invoice-modal');
+  const overlay = document.getElementById('drawer-overlay');
+  modal?.classList.remove('active');
+  overlay?.classList.remove('active');
+  document.body.classList.remove('mf-modal-open');
+};
+
+window.handleInvoiceSubmit = function(form) {
+  window.closeInvoiceModal();
+  showVelvetToast(
+    'Solicitud Fiscal Recibida',
+    'Hemos recibido tus datos fiscales con éxito. El CFDI 4.0 (PDF y XML) será enviado a tu correo en menos de 24 horas hábiles.'
+  );
+  form.reset();
+};
+
+/* ==========================================================================
+   NEWSLETTER & CARTAS DE MONSIEUR
+   ========================================================================== */
+window.handleNewsletterSubmit = function(form) {
+  const emailInput = document.getElementById('newsletter-email-input');
+  const email = emailInput?.value || '';
+  if (emailInput) emailInput.value = '';
+  showVelvetToast(
+    '¡Merci por tu confianza!',
+    `Monsieur Flores te da la bienvenida al círculo íntimo. Recibirás nuestras reflexiones botánicas y beneficios de atelier en ${email}.`
+  );
+};
+
+/* ==========================================================================
+   SELECTOR DE MONEDA EN TOPBAR (MXN, USD, EUR)
+   ========================================================================== */
+function initCurrencySwitcher() {
+  const buttons = document.querySelectorAll('.mf-curr-btn');
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const curr = btn.getAttribute('data-curr');
+      if (curr) {
+        store.setCurrency(curr);
+        buttons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        showVelvetToast('Divisa Actualizada', `Precios exhibidos en ${curr}`);
+      }
+    });
+  });
+}
+
+/* ==========================================================================
+   SERVICE WORKER (PWA & OFFLINE CACHE)
+   ========================================================================== */
+function initServiceWorker() {
+  if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+    window.addEventListener('load', () => {
+      const isGhPages = window.location.pathname.includes('/MONSIEUR-FLORES');
+      const swUrl = isGhPages ? '/MONSIEUR-FLORES/sw.js' : '/sw.js';
+      navigator.serviceWorker.register(swUrl).then(reg => {
+        console.log('Monsieur Flores PWA ServiceWorker registrado con éxito:', reg.scope);
+      }).catch(err => {
+        console.info('PWA ServiceWorker en modo desarrollo o no disponible:', err);
+      });
+    });
+  }
 }

@@ -19,6 +19,10 @@ class Store {
     this.activeCategory = 'all';
     this.searchQuery = '';
     
+    // Cupones y Descuentos de Atelier
+    this.coupon = this.loadFromStorage('mf_coupon', null); // { code, label, discountType: 'pct'|'fixed', value }
+    this.currency = this.loadFromStorage('mf_currency', 'MXN'); // 'MXN' | 'USD' | 'EUR'
+    
     this.wizard = {
       step: 1,
       recipient: 'pareja',
@@ -31,19 +35,22 @@ class Store {
       cart: false,
       favorites: false,
       search: false,
+      tracking: false,
+      invoice: false,
       productDetail: null,
       checkout: false,
       checkoutStep: 1,
       whatsapp: false
     };
 
-    this.orderTracking = {
+    this.orderTracking = this.loadFromStorage('mf_order_tracking', {
       orderId: 'MF-' + Math.floor(100000 + Math.random() * 900000),
       status: 'preparando', // 'recibido', 'preparando', 'en-camino', 'entregado'
       progress: 55,
       deliverySlot: 'Hoy, 2:00 PM – 4:00 PM',
+      recipientName: 'Sofía Navarro',
       address: 'Calzada del Valle 400, San Pedro Garza García'
-    };
+    });
 
     this.listeners = new Map();
   }
@@ -134,6 +141,93 @@ class Store {
       const addonsCost = (item.addons || []).reduce((aSum, a) => aSum + a.price, 0);
       return sum + base + addonsCost;
     }, 0);
+  }
+
+  // --- Sistema de Cupones de Atelier ---
+  applyCoupon(rawCode) {
+    if (!rawCode) return { success: false, message: 'Ingresa un código de cortesía.' };
+    const code = rawCode.trim().toUpperCase();
+    const VALID_COUPONS = {
+      'MONSIEUR10': { label: '10% de Cortesía de Atelier', discountType: 'pct', value: 0.10 },
+      'COCOAN': { label: 'Bono $200 MXN en Chocolatería Fina', discountType: 'fixed', value: 200 },
+      'BIENVENIDA': { label: '15% Primer Encargo Floral', discountType: 'pct', value: 0.15 },
+      'AMOR2026': { label: '12% Especial San Valentín / Romance', discountType: 'pct', value: 0.12 }
+    };
+
+    if (VALID_COUPONS[code]) {
+      this.coupon = { code, ...VALID_COUPONS[code] };
+      this.saveToStorage('mf_coupon', this.coupon);
+      this.notify('cart:updated', this.cart);
+      return { success: true, message: `Código ${code} aplicado: ${this.coupon.label}` };
+    }
+
+    return { success: false, message: 'Código no válido o expirado en el Atelier de Monsieur.' };
+  }
+
+  removeCoupon() {
+    this.coupon = null;
+    this.saveToStorage('mf_coupon', null);
+    this.notify('cart:updated', this.cart);
+  }
+
+  getDiscountAmount() {
+    if (!this.coupon) return 0;
+    const subtotal = this.getCartSubtotal();
+    if (this.coupon.discountType === 'pct') {
+      return Math.round(subtotal * this.coupon.value);
+    }
+    if (this.coupon.discountType === 'fixed') {
+      return Math.min(subtotal, this.coupon.value);
+    }
+    return 0;
+  }
+
+  getCartTotal() {
+    return Math.max(0, this.getCartSubtotal() - this.getDiscountAmount());
+  }
+
+  // --- Moneda & Formato Internacional ---
+  setCurrency(curr) {
+    if (['MXN', 'USD', 'EUR'].includes(curr)) {
+      this.currency = curr;
+      this.saveToStorage('mf_currency', curr);
+      this.notify('currency:updated', curr);
+    }
+  }
+
+  formatPrice(mxnAmount) {
+    const rates = { MXN: 1, USD: 0.052, EUR: 0.048 };
+    const symbols = { MXN: '$', USD: 'US$', EUR: '€' };
+    const rate = rates[this.currency] || 1;
+    const symbol = symbols[this.currency] || '$';
+    const converted = Math.round(mxnAmount * rate);
+    return `${symbol}${converted.toLocaleString('es-MX')} ${this.currency}`;
+  }
+
+  // --- Seguimiento de Pedidos ---
+  getTrackingInfo(searchFolio) {
+    const clean = (searchFolio || '').trim().toUpperCase();
+    if (clean === this.orderTracking.orderId.toUpperCase() || clean === 'DEMO' || clean === 'MF-2026') {
+      return {
+        found: true,
+        order: this.orderTracking
+      };
+    }
+    // Generar un resultado realista y coherente si el folio tiene formato MF-XXXXX
+    if (/^MF-\d{4,6}$/i.test(clean)) {
+      return {
+        found: true,
+        order: {
+          orderId: clean,
+          status: 'en-camino',
+          progress: 75,
+          deliverySlot: 'Hoy, 3:30 PM – 5:30 PM',
+          recipientName: 'Destinatario Especial',
+          address: 'Zona Residencial Poniente, CDMX'
+        }
+      };
+    }
+    return { found: false };
   }
 
   getCartCount() {
