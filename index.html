@@ -205,10 +205,23 @@
   </header>
 
   <main>
-    <!-- 3. HERO — La sección más importante -->
+    <!-- 3. HERO — Comercial Oficial Monsieur Flores (Sin audio, sin opacidad) -->
     <section class="mf-hero" id="hero">
       <div class="mf-hero-media">
-        <img src="./images/monsieur-atelier-craft.jpg" alt="Monsieur Flores preparando una creación floral de autor en su atelier" class="mf-hero-img" loading="eager">
+        <video 
+          class="mf-hero-video" 
+          autoplay 
+          loop 
+          muted 
+          playsinline 
+          webkit-playsinline 
+          preload="auto"
+          poster="./images/hero-video-poster.jpg"
+          aria-label="Comercial Monsieur Flores Atelier"
+        >
+          <source src="./videos/mf-comercial-hero.mp4" type="video/mp4">
+          <img src="./images/hero-video-poster.jpg" alt="Monsieur Flores en su Atelier" class="mf-hero-img">
+        </video>
       </div>
       <div class="mf-hero-overlay"></div>
       

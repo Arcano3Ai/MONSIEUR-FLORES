@@ -8,6 +8,7 @@ window.store = store;
 
 function initApp() {
   initHeader();
+  initHeroVideo();
   initAtelierAudio();
   renderEmotions();
   renderProducts();
@@ -1627,6 +1628,35 @@ document.addEventListener('keydown', (e) => {
 });
 
 
+
+/* ==========================================================================
+   HERO COMMERCIAL VIDEO — REPRODUCCIÓN CONTINUA SIN AUDIO
+   ========================================================================== */
+function initHeroVideo() {
+  const video = document.querySelector('.mf-hero-video');
+  if (!video) return;
+  video.muted = true;
+  video.defaultMuted = true;
+  video.playsInline = true;
+
+  const startPlayback = () => {
+    const playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        // Fallback por políticas de bajo consumo o restricción móvil: reintentar al primer tap
+        const playOnFirstTouch = () => {
+          video.play().catch(() => {});
+          window.removeEventListener('touchstart', playOnFirstTouch);
+          window.removeEventListener('click', playOnFirstTouch);
+        };
+        window.addEventListener('touchstart', playOnFirstTouch, { passive: true, once: true });
+        window.addEventListener('click', playOnFirstTouch, { passive: true, once: true });
+      });
+    }
+  };
+
+  startPlayback();
+}
 
 /* ==========================================================================
    ATELIER AMBIENT AUDIO — REPRODUCTOR RESILIENTE MÓVIL Y ESCRITORIO
